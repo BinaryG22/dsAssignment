@@ -10,6 +10,8 @@ dslab/transfer/ITransferServer.java
  dslab.transfer.ITransferServer
 dslab/mailbox/IMailboxServer.java
  dslab.mailbox.IMailboxServer
+dslab/transfer/tcp/ServerThread.java
+ dslab.transfer.tcp.ServerThread
 dslab/mailbox/MailboxServer.java
  dslab.mailbox.MailboxServer
 dslab/monitoring/IMonitoringServer.java
