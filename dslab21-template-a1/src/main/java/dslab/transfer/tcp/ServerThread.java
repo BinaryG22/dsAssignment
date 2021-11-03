@@ -28,10 +28,10 @@ public class ServerThread extends Thread{
                 String request;
                 // read client requests
                 while(true) {
-                    System.out.println("currently in while loop in server thread");
                     String line = reader.readLine();
                     if(line == null) break;
                     writer.println("Echo: " + line);
+                    writer.flush();
                 }
                 clientSocket.close();
                 // construct response here
