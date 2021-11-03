@@ -41,31 +41,39 @@ public class TransferServer implements ITransferServer, Runnable {
 
     @Override
     public void run() {
-
-
         try {
             tcp_server = new ServerSocket(config.getInt("tcp.port"));
-            threadPool = Executors.newFixedThreadPool(10);
-            threadPool.execute(new ServerThread(tcp_server));
-
-            System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
-
-            try {
-                server_reader.readLine();
-            } catch (IOException e) {
-
-            }
-
-            // closing or shutdown
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        while (true) {
+            try {
+
+
+                System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
+                Socket newClient = tcp_server.accept();
+                threadPool = Executors.newCachedThreadPool();
+                threadPool.submit(new ServerThread(newClient));
+
+
+                // closing or shutdown
+            } catch (IOException e) {
+                e.printStackTrace();
+                shutdown();
+            }
+
+        }
     }
 
     @Override
     public void shutdown() {
-        // TODO
+        threadPool.shutdownNow();
+        try {
+            tcp_server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) throws Exception {

@@ -9,36 +9,37 @@ import java.net.Socket;
 
 
 public class ServerThread extends Thread{
-    private ServerSocket serverSocket;
+    private Socket clientSocket;
 
-    public ServerThread(ServerSocket serverSocket){
-        this.serverSocket = serverSocket;
+    public ServerThread(Socket clientSocket){
+        this.clientSocket = clientSocket;
     }
 
     @Override
     public void run() {
-        while (true) {
-            Socket socket = null;
             // wait for Client to connect
             try {
-                socket = serverSocket.accept();
+                System.out.println("Thread ID: "+this.getId());
                 // prepare the input reader for the socket
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // prepare the writer for responding to clients requests
-                PrintWriter writer = new PrintWriter(socket.getOutputStream());
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 
                 String request;
                 // read client requests
-                while ((request = reader.readLine()) != null) {
-                    System.out.println("Client sent the following request: " + request);
+                while(true) {
+                    System.out.println("currently in while loop in server thread");
+                    String line = reader.readLine();
+                    if(line == null) break;
+                    writer.println("Echo: " + line);
                 }
+                clientSocket.close();
                 // construct response here
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
-        }
 
     }
 }
