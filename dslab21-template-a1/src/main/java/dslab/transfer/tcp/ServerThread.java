@@ -1,5 +1,7 @@
 package dslab.transfer.tcp;
 
+import dslab.DMTP.DmtProtocol;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +12,11 @@ import java.net.Socket;
 
 public class ServerThread extends Thread{
     private Socket clientSocket;
+    private DmtProtocol dmtProtocol;
 
     public ServerThread(Socket clientSocket){
         this.clientSocket = clientSocket;
+        this.dmtProtocol = new DmtProtocol();
     }
 
     @Override
@@ -25,13 +29,27 @@ public class ServerThread extends Thread{
                 // prepare the writer for responding to clients requests
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 
+                writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
+                writer.flush();
+
+
                 String request;
+                String response;
                 // read client requests
-                while(true) {
-                    String line = reader.readLine();
-                    if(line == null) break;
-                    writer.println("Echo: " + line);
+                while ((request = reader.readLine()) != null) {
+                    System.out.println("Client sent the following request: " + request);
+
+                    /*
+                     * check if request has the correct format: !ping
+                     * <client-name>
+                     */
+
+                    response = dmtProtocol.validateRequest(request);
+
+                    writer.println("Server answers: " + response);
                     writer.flush();
+
+
                 }
                 clientSocket.close();
                 // construct response here
