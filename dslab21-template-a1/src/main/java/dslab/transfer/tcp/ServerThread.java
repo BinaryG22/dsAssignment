@@ -1,12 +1,12 @@
 package dslab.transfer.tcp;
 
 import dslab.DMTP.DmtProtocol;
+import dslab.util.Config;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 
@@ -14,9 +14,9 @@ public class ServerThread extends Thread{
     private Socket clientSocket;
     private DmtProtocol dmtProtocol;
 
-    public ServerThread(Socket clientSocket){
+    public ServerThread(Socket clientSocket, Config config){
         this.clientSocket = clientSocket;
-        this.dmtProtocol = new DmtProtocol();
+        this.dmtProtocol = new DmtProtocol(config);
     }
 
     @Override

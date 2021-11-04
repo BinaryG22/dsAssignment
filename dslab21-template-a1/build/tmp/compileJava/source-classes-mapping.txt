@@ -10,8 +10,12 @@ dslab/transfer/ITransferServer.java
  dslab.transfer.ITransferServer
 dslab/mailbox/IMailboxServer.java
  dslab.mailbox.IMailboxServer
+dslab/DMAP/DmaProtocol.java
+ dslab.DMAP.DmaProtocol
 dslab/transfer/tcp/ServerThread.java
  dslab.transfer.tcp.ServerThread
+dslab/mailbox/dmapServer/DmapServerThread.java
+ dslab.mailbox.dmapServer.DmapServerThread
 dslab/DMTP/DmtProtocol.java
  dslab.DMTP.DmtProtocol
 dslab/mailbox/MailboxServer.java

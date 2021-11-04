@@ -1,5 +1,7 @@
 package dslab.DMTP;
 
+import dslab.util.Config;
+
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +15,7 @@ public class DmtProtocol {
     private boolean dataIsSet;
     private boolean isSend;
     private boolean toQuit;
+    private Config config;
 
     private ArrayList<String> recipients = new ArrayList<>();
 
@@ -41,7 +44,7 @@ public class DmtProtocol {
     final static String DEFAULT_RESPONSE = "ok";
     final static String PROTOCOL_ERROR = "Error protocol error";
 
-    public DmtProtocol() {
+    public DmtProtocol(Config config) {
         connectionIsEstablished = false;
         messageIsStarted = false;
         recipientIsSet = false;
@@ -50,6 +53,7 @@ public class DmtProtocol {
         dataIsSet = false;
         isSend = false;
         toQuit = false;
+        this.config = config;
     }
 
 
