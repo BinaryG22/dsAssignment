@@ -1,5 +1,7 @@
 package dslab.transfer.tcp;
 
+import dslab.DMTP.DmtProtocol;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,36 +11,53 @@ import java.net.Socket;
 
 
 public class ServerThread extends Thread{
-    private ServerSocket serverSocket;
+    private Socket clientSocket;
+    private DmtProtocol dmtProtocol;
 
-    public ServerThread(ServerSocket serverSocket){
-        this.serverSocket = serverSocket;
+    public ServerThread(Socket clientSocket){
+        this.clientSocket = clientSocket;
+        this.dmtProtocol = new DmtProtocol();
     }
 
     @Override
     public void run() {
-        while (true) {
-            Socket socket = null;
             // wait for Client to connect
             try {
-                socket = serverSocket.accept();
+                System.out.println("Thread ID: "+this.getId());
                 // prepare the input reader for the socket
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 // prepare the writer for responding to clients requests
-                PrintWriter writer = new PrintWriter(socket.getOutputStream());
+                PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
+
+                writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
+                writer.flush();
+
 
                 String request;
+                String response;
                 // read client requests
                 while ((request = reader.readLine()) != null) {
                     System.out.println("Client sent the following request: " + request);
+
+                    /*
+                     * check if request has the correct format: !ping
+                     * <client-name>
+                     */
+
+                    response = dmtProtocol.validateRequest(request);
+
+                    writer.println("Server answers: " + response);
+                    writer.flush();
+
+
                 }
+                clientSocket.close();
                 // construct response here
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
-        }
 
     }
 }
