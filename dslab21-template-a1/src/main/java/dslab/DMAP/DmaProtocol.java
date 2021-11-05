@@ -49,7 +49,13 @@ public class DmaProtocol {
     }
 
     private String logout() {
-        return null;
+        if(isLoggedIn){
+            userName = null;
+            isLoggedIn = false;
+            return DEFAULT_RESPONSE;
+        }else{
+            return "you are not logged in";
+        }
     }
 
     private String quit() {
