@@ -54,7 +54,7 @@ public class TransferServer implements ITransferServer, Runnable {
                 System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
                 Socket newClient = tcp_server.accept();
                 threadPool = Executors.newCachedThreadPool();
-                threadPool.submit(new ServerThread(newClient));
+                threadPool.submit(new ServerThread(newClient, config));
 
 
                 // closing or shutdown
