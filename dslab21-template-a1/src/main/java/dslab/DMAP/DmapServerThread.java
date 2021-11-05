@@ -1,4 +1,4 @@
-package dslab.mailbox.dmapServer;
+package dslab.DMAP;
 
 import dslab.DMAP.DmaProtocol;
 import dslab.util.Config;
