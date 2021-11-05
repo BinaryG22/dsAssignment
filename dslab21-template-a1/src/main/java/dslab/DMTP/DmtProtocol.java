@@ -18,6 +18,7 @@ public class DmtProtocol {
     private Config config;
 
     private ArrayList<String> recipients = new ArrayList<>();
+    private String recipients_asString;
 
     public ArrayList<String> getRecipients() {
         return recipients;
@@ -39,6 +40,7 @@ public class DmtProtocol {
     private String subject;
     private String data;
     private String finaleMessage;
+    private String[] messageToMailboxServer = null;
 
     final static String PROTOCOL_TYPE = "DMTP";
     final static String DEFAULT_RESPONSE = "ok";
@@ -95,9 +97,11 @@ public class DmtProtocol {
         if (!subjectIsSet) return "error no subject";
 
         isSend = true;
-        finaleMessage = this.toString();
-
-        return finaleMessage;
+        messageToMailboxServer[0] = sender;
+        messageToMailboxServer[1] = recipients_asString;
+        messageToMailboxServer[2] = subject;
+        messageToMailboxServer[3] = data;
+        return "send";
     }
 
     private String quit() {
@@ -110,6 +114,7 @@ public class DmtProtocol {
             return "recipients not set";
         }else{
             recipientIsSet = true;
+            recipients_asString = parts[1];
             String[] addresses = parts[1].split(",");
             recipients.addAll(Arrays.asList(addresses));
             return DEFAULT_RESPONSE + " " + recipients.size();
@@ -195,6 +200,10 @@ public class DmtProtocol {
                 ", subject='" + subject + '\'' +
                 ", data='" + data + '\'' +
                 '}';
+    }
+
+    public String[] getMessageForMailboxServer() {
+        return messageToMailboxServer;
     }
 }
 
