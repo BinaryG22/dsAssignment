@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import dslab.ComponentFactory;
-import dslab.transfer.tcp.ServerThread;
+import dslab.DMTP.DmtpServerThread;
 import dslab.util.Config;
 
 public class TransferServer implements ITransferServer, Runnable {
@@ -54,7 +54,7 @@ public class TransferServer implements ITransferServer, Runnable {
                 System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
                 Socket newClient = tcp_server.accept();
                 threadPool = Executors.newCachedThreadPool();
-                threadPool.submit(new ServerThread(newClient, config));
+                threadPool.submit(new DmtpServerThread(newClient, config));
 
 
                 // closing or shutdown
