@@ -3,6 +3,7 @@ package dslab.DMAP;
 import dslab.util.Config;
 
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DmaProtocol {
     private boolean isLoggedIn;
@@ -12,6 +13,10 @@ public class DmaProtocol {
     private Config config;
     private boolean connectionIsEstablished;
     private String userName = null;
+
+    //k = message ID; v = user?
+    private int messageID;
+    ConcurrentHashMap concurrentHashMap = new ConcurrentHashMap();
 
     public DmaProtocol(Config config) {
         isLoggedIn = false;
