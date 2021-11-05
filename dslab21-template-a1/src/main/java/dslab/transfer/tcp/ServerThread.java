@@ -45,11 +45,14 @@ public class ServerThread extends Thread{
                      */
 
                     response = dmtProtocol.validateRequest(request);
+                    if (response.equals("send")){
+                        String[] messageForMailboxServer = dmtProtocol.getMessageForMailboxServer();
+
+                    }
+
 
                     writer.println("Server answers: " + response);
                     writer.flush();
-
-
                 }
                 clientSocket.close();
                 // construct response here

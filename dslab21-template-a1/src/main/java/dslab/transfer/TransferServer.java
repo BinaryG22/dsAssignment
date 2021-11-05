@@ -19,6 +19,8 @@ public class TransferServer implements ITransferServer, Runnable {
     private BufferedReader server_reader;
     private PrintWriter server_writer;
     private ExecutorService threadPool;
+
+    //save a Buffer for handling saving (or better preparing or creating) messages and forwarding messages
     /*
     TCP
      */
