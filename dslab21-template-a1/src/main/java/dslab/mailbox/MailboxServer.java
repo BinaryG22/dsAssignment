@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import dslab.ComponentFactory;
-import dslab.DMAP.DmapServerThread;
 import dslab.DMTP.DmtpServerThread;
 import dslab.util.Config;
 
@@ -33,12 +32,15 @@ public class MailboxServer implements IMailboxServer, Runnable {
     private BufferedReader dmtp_server_reader;
     private PrintWriter dmtp_server_writer;
     private ExecutorService dmtp_threadPool;
-
+    private String component_id;
     /*
     DMTP
      */
 
     private Config config;
+
+    private static ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages
+            = new ConcurrentHashMap<>();
 
     /**
      * Creates a new server instance.
@@ -50,8 +52,13 @@ public class MailboxServer implements IMailboxServer, Runnable {
      */
     public MailboxServer(String componentId, Config config, InputStream in, PrintStream out) {
         this.config = config;
+        this.component_id = componentId;
         dmap_server_reader = new BufferedReader(new InputStreamReader(in));
         dmap_server_writer = new PrintWriter(out);
+    }
+
+    public static void saveMessageInHashMap(String[] messageForMailboxServer) {
+
     }
 
     @Override
@@ -67,30 +74,15 @@ public class MailboxServer implements IMailboxServer, Runnable {
         } catch (IOException e){
             e.printStackTrace();
         }
+            System.out.println("DMAP Server is UP and listening on port: " + dmap_mailboxServer.getLocalPort());
+            Thread dmapListener = new DmapListener(dmap_mailboxServer, config);
+            dmapListener.start();
 
-        while (true) {
-            try {
+            //DMTP
+            System.out.println("DMTP Server is UP and listening on port " + dmtp_mailboxServer.getLocalPort());
+            Thread dmtpListener = new DmtpListener(dmtp_mailboxServer, config);
+            dmtpListener.start();
 
-                //DMAP
-                System.out.println("Server is UP and listening on port: " + dmap_mailboxServer.getLocalPort());
-                Socket dmap_newClient = dmap_mailboxServer.accept();
-                dmap_threadPool = Executors.newCachedThreadPool();
-                dmap_threadPool.submit(new DmapServerThread(dmap_newClient, config));
-
-                //DMTP
-                System.out.println("DMTP Server is UP and listening on port " + dmtp_mailboxServer.getLocalPort());
-                Socket dmtp_newClient = dmtp_mailboxServer.accept();
-                dmap_threadPool = Executors.newCachedThreadPool();
-                dmap_threadPool.submit(new DmtpServerThread(dmtp_newClient, config));
-
-
-                // closing or shutdown
-            } catch (IOException e) {
-                e.printStackTrace();
-                shutdown();
-            }
-
-        }
     }
 
     @Override

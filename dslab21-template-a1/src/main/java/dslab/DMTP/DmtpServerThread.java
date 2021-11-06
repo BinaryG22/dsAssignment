@@ -1,20 +1,27 @@
 package dslab.DMTP;
 
+import dslab.ComponentFactory;
 import dslab.DMTP.DmtProtocol;
+import dslab.mailbox.MailboxServer;
+import dslab.transfer.TransferServerClient;
 import dslab.util.Config;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class DmtpServerThread extends Thread{
     private Socket clientSocket;
     private DmtProtocol dmtProtocol;
+    private ExecutorService threadPool;
+    private Config config;
+
 
     public DmtpServerThread(Socket clientSocket, Config config){
+        this.config = config;
         this.clientSocket = clientSocket;
         this.dmtProtocol = new DmtProtocol(config);
     }
@@ -29,6 +36,9 @@ public class DmtpServerThread extends Thread{
                 // prepare the writer for responding to clients requests
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 
+
+                System.out.println(dmtProtocol.checkConnection(clientSocket));
+
                 writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
                 writer.flush();
 
@@ -36,7 +46,10 @@ public class DmtpServerThread extends Thread{
                 String request;
                 String response;
                 // read client requests
-                while ((request = reader.readLine()) != null) {
+                //debug now here
+
+                while (true) {
+                    request = reader.readLine();
                     System.out.println("Client sent the following request: " + request);
 
                     /*
@@ -45,18 +58,30 @@ public class DmtpServerThread extends Thread{
                      */
 
                     response = dmtProtocol.validateRequest(request);
+
                     if (response.equals("send")){
                         String[] messageForMailboxServer = dmtProtocol.getMessageForMailboxServer();
+                        System.out.println(Arrays.toString(messageForMailboxServer));
+                        threadPool = Executors.newCachedThreadPool();
+                        threadPool.submit(new TransferServerClient(config, messageForMailboxServer));
+                    }
 
+                    if (response.equals("save")){
+                        MailboxServer.saveMessageInHashMap(dmtProtocol.getMessageForMailboxServer());
                     }
 
 
+                    System.out.println("server answers: " +response);
                     writer.println("Server answers: " + response);
                     writer.flush();
                 }
-                clientSocket.close();
                 // construct response here
             } catch (IOException e) {
+                try {
+                    clientSocket.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 e.printStackTrace();
             }
 

@@ -11,6 +11,7 @@ import dslab.DMTP.DmtpServerThread;
 import dslab.util.Config;
 
 public class TransferServer implements ITransferServer, Runnable {
+    private String component_id;
     /*
     TCP
      */
@@ -36,6 +37,7 @@ public class TransferServer implements ITransferServer, Runnable {
      * @param out         the output stream to write console output to
      */
     public TransferServer(String componentId, Config config, InputStream in, PrintStream out) {
+        this.component_id = componentId;
         this.config = config;
         server_reader = new BufferedReader(new InputStreamReader(in));
         server_writer = new PrintWriter(out);

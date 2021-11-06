@@ -48,8 +48,6 @@ public class DmapServerThread extends Thread{
 
                 writer.println("Server answers: " + response);
                 writer.flush();
-
-
             }
             clientSocket.close();
             // construct response here

@@ -5,6 +5,7 @@ import dslab.util.Config;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class DmtProtocol {
     private boolean connectionIsEstablished;
@@ -36,11 +37,11 @@ public class DmtProtocol {
         return data;
     }
 
-    private String sender = "from";
+    private String sender;
     private String subject;
     private String data;
     private String finaleMessage;
-    private String[] messageToMailboxServer = null;
+    private String[] messageToMailboxServer;
 
     final static String PROTOCOL_TYPE = "DMTP";
     final static String DEFAULT_RESPONSE = "ok";
@@ -85,22 +86,33 @@ public class DmtProtocol {
             case "quit":
                 response = quit();
                 break;
+            case "save":
+                response = saveMessageInMailboxServer();
+            break;
             default:
                 response = PROTOCOL_ERROR;
         }
         return response;
     }
 
+    private String saveMessageInMailboxServer() {
+        return "save";
+    }
+
     private String sendMessage() {
+        messageToMailboxServer = new String[6];
         if (!senderIsSet) return "error no Sender";
         if (!recipientIsSet) return "error no recipients";
         if (!subjectIsSet) return "error no subject";
 
         isSend = true;
-        messageToMailboxServer[0] = sender;
-        messageToMailboxServer[1] = recipients_asString;
-        messageToMailboxServer[2] = subject;
-        messageToMailboxServer[3] = data;
+        messageToMailboxServer[0] = "begin";
+        messageToMailboxServer[1] = "from " + sender;
+        messageToMailboxServer[2] = "to " + recipients_asString;
+        messageToMailboxServer[3] = "subject " + subject;
+        messageToMailboxServer[4] = "data " + data;
+        messageToMailboxServer[5] = "save";
+
         return "send";
     }
 
@@ -109,15 +121,26 @@ public class DmtProtocol {
     }
 
     private String setRecipients(String[] parts) {
+        String[] addresses = null;
         recipients.clear();
         if (parts.length == 1){
             return "recipients not set";
         }else{
             recipientIsSet = true;
             recipients_asString = parts[1];
-            String[] addresses = parts[1].split(",");
-            recipients.addAll(Arrays.asList(addresses));
-            return DEFAULT_RESPONSE + " " + recipients.size();
+            if (recipients_asString.contains(",")) {
+                addresses = parts[1].split(",");
+            }else addresses = new String[] {parts[1]};
+                for (String adress:addresses
+                ) {
+                    if (adress.contains("@")){
+                        String[] parseAdress = adress.split("@");
+                        if (parseAdress[1].equals("earth.planet") || parseAdress[1].equals("univer.ze")){
+                            recipients.addAll(List.of(adress));
+                        }else return adress + " contains an unknown domain";
+                    }else return "missing '@'";
+                }
+                return DEFAULT_RESPONSE + " " + recipients.size();
         }
     }
 
