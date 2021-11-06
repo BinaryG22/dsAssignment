@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dslab.ComponentFactory;
 import dslab.mailbox.dmap.DmapListener;
@@ -42,6 +44,8 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
     private static  ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages;
 
+   private static AtomicInteger hashMap_id = new AtomicInteger(1);
+
     /**
      * Creates a new server instance.
      *
@@ -58,9 +62,12 @@ public class MailboxServer implements IMailboxServer, Runnable {
         concurrentHashMap_messages = new ConcurrentHashMap<>();
     }
 
-    public static void saveMessageInHashMap(String[] messageForMailboxServer) {
-        concurrentHashMap_messages.put(1, messageForMailboxServer);
-        System.out.println("Massage entry in hashmap: " + Arrays.toString(concurrentHashMap_messages.get(1)));
+    public static synchronized void saveMessageInHashMap(String[] messageForMailboxServer) {
+        int key = hashMap_id.get();
+        concurrentHashMap_messages.put(key, messageForMailboxServer);
+        System.out.println("hashmap:" + concurrentHashMap_messages.toString());
+        hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
+        System.out.println("new hasmap id: " + hashMap_id);
     }
 
     @Override
@@ -76,6 +83,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         } catch (IOException e){
             e.printStackTrace();
         }
+
             System.out.println("DMAP Server is UP and listening on port: " + dmap_mailboxServer.getLocalPort());
             Thread dmapListener = new DmapListener(dmap_mailboxServer, config);
             dmapListener.start();

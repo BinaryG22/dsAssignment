@@ -47,6 +47,7 @@ public class TransferServer implements ITransferServer, Runnable {
     public void run() {
         try {
             tcp_server = new ServerSocket(config.getInt("tcp.port"));
+            threadPool = Executors.newCachedThreadPool();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -54,10 +55,8 @@ public class TransferServer implements ITransferServer, Runnable {
         while (true) {
             try {
 
-
                 System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
                 Socket newClient = tcp_server.accept();
-                threadPool = Executors.newCachedThreadPool();
                 threadPool.submit(new Transfer_DmtpServerThread(newClient, config));
 
 

@@ -28,8 +28,6 @@ public class TransferServerClient implements Runnable{
     @Override
     public void run() {
         Socket socket = null;
-
-        try {
             /*
              * create a new tcp socket at specified host and port - make sure
              * you specify them correctly in the client properties file(see
@@ -37,53 +35,12 @@ public class TransferServerClient implements Runnable{
              */
 
             if (message[2].contains("earth.planet")) {
-                String[] parts = domain_config.getString("earth.planet").split(":");
-                socket = new Socket(parts[0], Integer.parseInt(parts[1]));
-            }else System.out.println("wrong index number on message for looking up adress");
-
-            assert socket != null;
-            // create a reader to retrieve messages send by the server
-            BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // create a writer to send messages to the server
-            PrintWriter serverWriter = new PrintWriter(socket.getOutputStream());
-            // create the client input reader from command line
-            //userInputReader = new BufferedReader(new InputStreamReader(System.in));
-            PrintWriter outputWriter = new PrintWriter(System.out);
-
-            int msg_index = 0;
-            System.out.println("message is:" + Arrays.toString(message));
-            while (true) {
-
-                String answerFromServer = serverReader.readLine();
-                System.out.println("answer from mailbox server:" + answerFromServer);
-
-                if (msg_index < message.length) {
-                    serverWriter.println(message[msg_index]);
-                    serverWriter.flush();
-                    msg_index++;
-                }else break;
+                new Thread(new MessageDeliverer(domain_config, "earth.planet", message)).start();
             }
 
-            //close socket?
-            socket.close();
-    }catch (UnknownHostException e) {
-            System.out.println("Cannot connect to host: " + e.getMessage());
-        } catch (SocketException e) {
-            // when the socket is closed, the I/O methods of the Socket will throw a SocketException
-            // almost all SocketException cases indicate that the socket was closed
-            System.out.println("SocketException while handling socket: " + e.getMessage());
-        } catch (IOException e) {
-            // you should properly handle all other exceptions
-            throw new UncheckedIOException(e);
-        } finally {
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    // Ignored because we cannot handle it
-                }
+            if (message[2].contains("univer.ze")){
+                new Thread(new MessageDeliverer(domain_config, "univer.ze", message)).start();
             }
 
-        }
     }
 }
