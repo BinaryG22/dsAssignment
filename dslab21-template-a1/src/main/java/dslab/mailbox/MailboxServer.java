@@ -3,12 +3,13 @@ package dslab.mailbox;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import dslab.ComponentFactory;
-import dslab.DMTP.DmtpServerThread;
+import dslab.mailbox.dmap.DmapListener;
+import dslab.mailbox.dmtp.DmtpListener;
 import dslab.util.Config;
 
 public class MailboxServer implements IMailboxServer, Runnable {
@@ -39,8 +40,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
     private Config config;
 
-    private static ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages
-            = new ConcurrentHashMap<>();
+    private static  ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages;
 
     /**
      * Creates a new server instance.
@@ -55,10 +55,12 @@ public class MailboxServer implements IMailboxServer, Runnable {
         this.component_id = componentId;
         dmap_server_reader = new BufferedReader(new InputStreamReader(in));
         dmap_server_writer = new PrintWriter(out);
+        concurrentHashMap_messages = new ConcurrentHashMap<>();
     }
 
     public static void saveMessageInHashMap(String[] messageForMailboxServer) {
-
+        concurrentHashMap_messages.put(1, messageForMailboxServer);
+        System.out.println("Massage entry in hashmap: " + Arrays.toString(concurrentHashMap_messages.get(1)));
     }
 
     @Override

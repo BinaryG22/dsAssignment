@@ -1,6 +1,6 @@
-package dslab.transfer;
+package dslab.transfer.client;
 
-import dslab.DMTP.DmtProtocol;
+import dslab.protocol.DmtProtocol;
 import dslab.util.Config;
 
 import java.io.*;
@@ -63,6 +63,9 @@ public class TransferServerClient implements Runnable{
                     msg_index++;
                 }else break;
             }
+
+            //close socket?
+            socket.close();
     }catch (UnknownHostException e) {
             System.out.println("Cannot connect to host: " + e.getMessage());
         } catch (SocketException e) {

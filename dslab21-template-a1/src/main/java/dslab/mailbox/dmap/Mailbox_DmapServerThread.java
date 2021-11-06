@@ -1,6 +1,6 @@
-package dslab.DMAP;
+package dslab.mailbox.dmap;
 
-import dslab.DMAP.DmaProtocol;
+import dslab.protocol.DmaProtocol;
 import dslab.util.Config;
 
 import java.io.BufferedReader;
@@ -10,11 +10,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 
-public class DmapServerThread extends Thread{
+public class Mailbox_DmapServerThread extends Thread{
     private Socket clientSocket;
     private DmaProtocol dmaProtocol;
 
-    public DmapServerThread(Socket clientSocket, Config config){
+    public Mailbox_DmapServerThread(Socket clientSocket, Config config){
         this.clientSocket = clientSocket;
         this.dmaProtocol = new DmaProtocol(config);
     }

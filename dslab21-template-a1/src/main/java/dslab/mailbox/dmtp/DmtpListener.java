@@ -1,6 +1,5 @@
-package dslab.mailbox;
+package dslab.mailbox.dmtp;
 
-import dslab.DMTP.DmtpServerThread;
 import dslab.util.Config;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class DmtpListener extends Thread{
         try {
             client = dmtpServerSocket.accept();
             dmtp_threadPool = Executors.newCachedThreadPool();
-            dmtp_threadPool.submit(new DmtpServerThread(client, config));
+            dmtp_threadPool.submit(new Mailbox_DmtpServerThread(client, config));
         } catch (IOException e) {
             e.printStackTrace();
         }

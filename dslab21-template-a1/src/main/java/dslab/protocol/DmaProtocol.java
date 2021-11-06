@@ -1,4 +1,4 @@
-package dslab.DMAP;
+package dslab.protocol;
 
 import dslab.util.Config;
 

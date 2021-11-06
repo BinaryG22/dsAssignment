@@ -1,4 +1,4 @@
-package dslab.DMTP;
+package dslab.protocol;
 
 import dslab.util.Config;
 
@@ -42,6 +42,12 @@ public class DmtProtocol {
     private String data;
     private String finaleMessage;
     private String[] messageToMailboxServer;
+
+    public String[] getToSaveInMailBoxServer() {
+        return toSaveInMailBoxServer;
+    }
+
+    private String[] toSaveInMailBoxServer;
 
     final static String PROTOCOL_TYPE = "DMTP";
     final static String DEFAULT_RESPONSE = "ok";
@@ -87,17 +93,23 @@ public class DmtProtocol {
                 response = quit();
                 break;
             case "save":
-                response = saveMessageInMailboxServer();
-            break;
+                response = save();
+                break;
             default:
                 response = PROTOCOL_ERROR;
         }
         return response;
     }
 
-    private String saveMessageInMailboxServer() {
+    private String save() {
+        toSaveInMailBoxServer = new String[4];
+        toSaveInMailBoxServer[0] = "from " + sender;
+        toSaveInMailBoxServer[1] = "to " + recipients_asString;
+        toSaveInMailBoxServer[2] = "subject " + subject;
+        toSaveInMailBoxServer[3] = "data " + data;
         return "save";
     }
+
 
     private String sendMessage() {
         messageToMailboxServer = new String[6];
@@ -113,7 +125,24 @@ public class DmtProtocol {
         messageToMailboxServer[4] = "data " + data;
         messageToMailboxServer[5] = "save";
 
+        resetAllValues();
+
         return "send";
+    }
+
+    private void resetAllValues() {
+        sender = null;
+        data = null;
+        recipients.clear();
+        subject = null;
+
+        isSend = false;
+        dataIsSet = false;
+        messageIsStarted = false;
+        recipientIsSet = false;
+        senderIsSet = false;
+        subjectIsSet = false;
+
     }
 
     private String quit() {
