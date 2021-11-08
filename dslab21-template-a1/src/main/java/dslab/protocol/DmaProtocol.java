@@ -78,8 +78,31 @@ public class DmaProtocol {
     }
 
     private String delete(String[] parts) {
-        return null;
+        if (parts.length != 2){
+            return PROTOCOL_ERROR;
+        }else {
+            if (MailboxServer.getConcurrentHashMap_messages().get(userName) != null) {
+                ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
+                if (isNumeric(parts[1])) {
+                    if (hashMap.containsKey(Integer.valueOf(parts[1]))) {
+                        hashMap.remove(Integer.valueOf(parts[1]));
+                        return DEFAULT_RESPONSE;
+                    } else return "could not find message with message id " + parts[1];
+                } return "id must be a number";
+            }return "list empty";
+        }
+    }
 
+    private static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 
     private String show(String[] parts) {
