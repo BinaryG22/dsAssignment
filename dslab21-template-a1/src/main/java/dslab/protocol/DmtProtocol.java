@@ -92,22 +92,10 @@ public class DmtProtocol {
             case "quit":
                 response = quit();
                 break;
-            case "save":
-                response = save();
-                break;
             default:
                 response = PROTOCOL_ERROR;
         }
         return response;
-    }
-
-    private String save() {
-        toSaveInMailBoxServer = new String[4];
-        toSaveInMailBoxServer[0] = "from " + sender;
-        toSaveInMailBoxServer[1] = "to " + recipients_asString;
-        toSaveInMailBoxServer[2] = "subject " + subject;
-        toSaveInMailBoxServer[3] = "data " + data;
-        return "save";
     }
 
 

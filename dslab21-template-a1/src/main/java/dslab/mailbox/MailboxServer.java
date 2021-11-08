@@ -3,6 +3,7 @@ package dslab.mailbox;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +43,13 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
     private Config config;
 
-    private static  ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages;
+    public static ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> getConcurrentHashMap_messages() {
+        return concurrentHashMap_messages;
+    }
+
+    //outer hashmap maps user to hashmap
+    // inner hashmap maps id to message
+    private static  ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> concurrentHashMap_messages;
 
    private static AtomicInteger hashMap_id = new AtomicInteger(1);
 
@@ -62,12 +69,29 @@ public class MailboxServer implements IMailboxServer, Runnable {
         concurrentHashMap_messages = new ConcurrentHashMap<>();
     }
 
-    public static synchronized void saveMessageInHashMap(String[] messageForMailboxServer) {
+    public static synchronized void saveMessageInHashMap(ArrayList<String> users, String sender, String subject, String data) {
         int key = hashMap_id.get();
-        concurrentHashMap_messages.put(key, messageForMailboxServer);
-        System.out.println("hashmap:" + concurrentHashMap_messages.toString());
+
+        for (String user: users
+             ) {
+            if (!concurrentHashMap_messages.containsKey(user)) {
+                concurrentHashMap_messages.put(user, new ConcurrentHashMap<Integer, String[]>());
+            }
+            concurrentHashMap_messages.get(user).put(key, new String[]{sender, subject});
+
+
+            System.out.println("concurrent hashmap of user: " + user);
+            for (String[] message:concurrentHashMap_messages.get(user).values()
+            ) {
+                System.out.println(Arrays.toString(message));
+            }
+        }
+
         hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
         System.out.println("new hasmap id: " + hashMap_id);
+
+
+
     }
 
     @Override

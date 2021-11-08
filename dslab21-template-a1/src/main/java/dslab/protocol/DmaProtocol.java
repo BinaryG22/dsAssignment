@@ -1,8 +1,12 @@
 package dslab.protocol;
 
+import dslab.mailbox.MailboxServer;
 import dslab.util.Config;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DmaProtocol {
@@ -13,6 +17,7 @@ public class DmaProtocol {
     private Config config;
     private boolean connectionIsEstablished;
     private String userName = null;
+    private ArrayList<String[]> allMessages;
 
     //k = message ID; v = user?
     private int messageID;
@@ -78,8 +83,19 @@ public class DmaProtocol {
     }
 
     private String list() {
-        return null;
-
+        allMessages = new ArrayList<>();
+        ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
+        for (Integer k: hashMap.keySet()
+             ) {
+            String[] message = hashMap.get(k);
+            allMessages.add(new String[]{k.toString(), message[0], message[1], message[2]});
+        }
+        System.out.println(allMessages.size());
+        for (String[] messages: allMessages
+             ) {
+            System.out.println(Arrays.toString(messages));
+        }
+        return "ok";
     }
 
     private String login(String[] parts) {
@@ -123,5 +139,9 @@ public class DmaProtocol {
             connectionIsEstablished = true;
             return DEFAULT_RESPONSE + " " + PROTOCOL_TYPE;
         } else return "Error DMAP connection error";
+    }
+
+    public ArrayList<String[]> getAllMessages() {
+        return allMessages;
     }
 }

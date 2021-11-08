@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Mailbox_DmapServerThread extends Thread{
@@ -43,9 +45,16 @@ public class Mailbox_DmapServerThread extends Thread{
                  * check if request has the correct format: !ping
                  * <client-name>
                  */
-
                 response = dmaProtocol.validateRequest(request);
 
+                if (request.equals("list")){
+                    for (String[] message: dmaProtocol.getAllMessages()
+                         ) {
+                        System.out.println(Arrays.toString(message));
+                        writer.println(Arrays.toString(message));
+                        writer.flush();
+                    }
+                }
                 writer.println("Server answers: " + response);
                 writer.flush();
             }
