@@ -48,12 +48,18 @@ public class Mailbox_DmapServerThread extends Thread{
                 response = dmaProtocol.validateRequest(request);
 
                 if (request.equals("list")){
-                    for (String[] message: dmaProtocol.getAllMessages()
-                         ) {
-                        System.out.println(Arrays.toString(message));
-                        writer.println(Arrays.toString(message));
+                    System.out.println("log in status: " + dmaProtocol.isLoggedIn());
+                    if (dmaProtocol.isLoggedIn()){
+                        writer.println("[ID, sender, subject]");
                         writer.flush();
-                    }
+                        for (String[] message: dmaProtocol.getAllMessages()
+                        ) {
+                            System.out.println(Arrays.toString(message));
+                            writer.println(Arrays.toString(message));
+                            writer.flush();
+                        }
+                        dmaProtocol.clearMessages();
+                    }else response = "you must first log in";
                 }
                 writer.println("Server answers: " + response);
                 writer.flush();

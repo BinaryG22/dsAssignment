@@ -77,7 +77,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
             if (!concurrentHashMap_messages.containsKey(user)) {
                 concurrentHashMap_messages.put(user, new ConcurrentHashMap<Integer, String[]>());
             }
-            concurrentHashMap_messages.get(user).put(key, new String[]{sender, subject});
+            concurrentHashMap_messages.get(user).put(key, new String[]{sender, subject, data});
 
 
             System.out.println("concurrent hashmap of user: " + user);
@@ -88,7 +88,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         }
 
         hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
-        System.out.println("new hasmap id: " + hashMap_id);
+
 
 
 

@@ -1,5 +1,5 @@
-dslab/protocol/DmtProtocol.java
- dslab.protocol.DmtProtocol
+dslab/ComponentFactory.java
+ dslab.ComponentFactory
 dslab/monitoring/MonitoringServer.java
  dslab.monitoring.MonitoringServer
 dslab/mailbox/IMailboxServer.java
@@ -8,8 +8,8 @@ dslab/mailbox/dmtp/DmtpListener.java
  dslab.mailbox.dmtp.DmtpListener
 dslab/monitoring/IMonitoringServer.java
  dslab.monitoring.IMonitoringServer
-dslab/transfer/client/TransferServerClient.java
- dslab.transfer.client.TransferServerClient
+dslab/mailbox/dmtp/Mailbox_DmtpServerThread.java
+ dslab.mailbox.dmtp.Mailbox_DmtpServerThread
 dslab/transfer/TransferServer.java
  dslab.transfer.TransferServer
 dslab/util/Config.java
@@ -18,17 +18,17 @@ dslab/transfer/client/MessageDeliverer.java
  dslab.transfer.client.MessageDeliverer
 dslab/transfer/ITransferServer.java
  dslab.transfer.ITransferServer
-dslab/mailbox/dmap/DmapListener.java
- dslab.mailbox.dmap.DmapListener
+dslab/protocol/DmaProtocol.java
+ dslab.protocol.DmaProtocol
 dslab/mailbox/dmap/Mailbox_DmapServerThread.java
  dslab.mailbox.dmap.Mailbox_DmapServerThread
 dslab/transfer/server/Transfer_DmtpServerThread.java
  dslab.transfer.server.Transfer_DmtpServerThread
-dslab/mailbox/dmtp/Mailbox_DmtpServerThread.java
- dslab.mailbox.dmtp.Mailbox_DmtpServerThread
-dslab/ComponentFactory.java
- dslab.ComponentFactory
-dslab/protocol/DmaProtocol.java
- dslab.protocol.DmaProtocol
+dslab/protocol/DmtProtocol.java
+ dslab.protocol.DmtProtocol
+dslab/mailbox/dmap/DmapListener.java
+ dslab.mailbox.dmap.DmapListener
 dslab/mailbox/MailboxServer.java
  dslab.mailbox.MailboxServer
+dslab/transfer/client/TransferServerClient.java
+ dslab.transfer.client.TransferServerClient
