@@ -1,6 +1,5 @@
-package dslab.transfer;
+package dslab.transfer.client;
 
-import dslab.DMTP.DmtProtocol;
 import dslab.util.Config;
 
 import java.io.*;
@@ -9,38 +8,39 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 
-public class TransferServerClient implements Runnable{
-        private Config config;
-        private DmtProtocol dmtProtocol;
-        private String[] message;
-        private Config domain_config;
+public class MessageDeliverer implements Runnable{
+    Config config;
+    private final static String EARTH_PLANET_DOMAIN = "earth.planet";
+    private final static String UNIVER_ZE_DOMAIN = "univer.ze";
+    Socket socket;
+    String[] message;
 
-        // takes a parameter with then the client should construct a dmtp message to the the mailbox server
-        public TransferServerClient(Config config, String[] message){
-            this.config = config;
-            this.dmtProtocol = new DmtProtocol(config);
-            this.message = message;
-            //instantiating this new Config does not work
-            domain_config = new Config("domains");
+
+    public MessageDeliverer(Config config, String domainName, String[] message){
+        this.message = message;
+        this.config = config;
+        if (domainName.equals(EARTH_PLANET_DOMAIN)){
+            String[] parts = config.getString("earth.planet").split(":");
+            System.out.println("host:" + parts[0] +", port:" + parts[1]);
+            try {
+                socket = new Socket(parts[0], Integer.parseInt(parts[1]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else if (domainName.equals(UNIVER_ZE_DOMAIN)){
+            String[] parts = config.getString("univer.ze").split(":");
+            System.out.println("host:" + parts[0] +", port:" + parts[1]);
+            try {
+                socket = new Socket(parts[0], Integer.parseInt(parts[1]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-
+    }
 
     @Override
     public void run() {
-        Socket socket = null;
-
         try {
-            /*
-             * create a new tcp socket at specified host and port - make sure
-             * you specify them correctly in the client properties file(see
-             * client1.properties and client2.properties)
-             */
-
-            if (message[2].contains("earth.planet")) {
-                String[] parts = domain_config.getString("earth.planet").split(":");
-                socket = new Socket(parts[0], Integer.parseInt(parts[1]));
-            }else System.out.println("wrong index number on message for looking up adress");
-
             assert socket != null;
             // create a reader to retrieve messages send by the server
             BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -61,9 +61,15 @@ public class TransferServerClient implements Runnable{
                     serverWriter.println(message[msg_index]);
                     serverWriter.flush();
                     msg_index++;
-                }else break;
+                } else break;
             }
-    }catch (UnknownHostException e) {
+            //close socket?;
+            socket = null;
+        }
+
+
+
+        catch (UnknownHostException e) {
             System.out.println("Cannot connect to host: " + e.getMessage());
         } catch (SocketException e) {
             // when the socket is closed, the I/O methods of the Socket will throw a SocketException

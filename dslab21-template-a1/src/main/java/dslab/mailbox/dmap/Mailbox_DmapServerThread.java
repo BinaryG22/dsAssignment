@@ -1,6 +1,6 @@
-package dslab.DMAP;
+package dslab.mailbox.dmap;
 
-import dslab.DMAP.DmaProtocol;
+import dslab.protocol.DmaProtocol;
 import dslab.util.Config;
 
 import java.io.BufferedReader;
@@ -8,13 +8,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
-public class DmapServerThread extends Thread{
+public class Mailbox_DmapServerThread extends Thread{
     private Socket clientSocket;
     private DmaProtocol dmaProtocol;
 
-    public DmapServerThread(Socket clientSocket, Config config){
+    public Mailbox_DmapServerThread(Socket clientSocket, Config config){
         this.clientSocket = clientSocket;
         this.dmaProtocol = new DmaProtocol(config);
     }
@@ -43,9 +45,22 @@ public class DmapServerThread extends Thread{
                  * check if request has the correct format: !ping
                  * <client-name>
                  */
-
                 response = dmaProtocol.validateRequest(request);
 
+                if (request.equals("list")){
+                    System.out.println("log in status: " + dmaProtocol.isLoggedIn());
+                    if (dmaProtocol.isLoggedIn()){
+                        writer.println("[ID, sender, subject]");
+                        writer.flush();
+                        for (String[] message: dmaProtocol.getAllMessages()
+                        ) {
+                            System.out.println(Arrays.toString(message));
+                            writer.println(Arrays.toString(message));
+                            writer.flush();
+                        }
+                        dmaProtocol.clearMessages();
+                    }else response = "you must first log in";
+                }
                 writer.println("Server answers: " + response);
                 writer.flush();
             }

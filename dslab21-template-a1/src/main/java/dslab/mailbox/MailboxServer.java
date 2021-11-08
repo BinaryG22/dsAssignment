@@ -3,12 +3,16 @@ package dslab.mailbox;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import dslab.ComponentFactory;
-import dslab.DMTP.DmtpServerThread;
+import dslab.mailbox.dmap.DmapListener;
+import dslab.mailbox.dmtp.DmtpListener;
 import dslab.util.Config;
 
 public class MailboxServer implements IMailboxServer, Runnable {
@@ -39,8 +43,15 @@ public class MailboxServer implements IMailboxServer, Runnable {
 
     private Config config;
 
-    private static ConcurrentHashMap<Integer, String[]> concurrentHashMap_messages
-            = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> getConcurrentHashMap_messages() {
+        return concurrentHashMap_messages;
+    }
+
+    //outer hashmap maps user to hashmap
+    // inner hashmap maps id to message
+    private static  ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> concurrentHashMap_messages;
+
+   private static AtomicInteger hashMap_id = new AtomicInteger(1);
 
     /**
      * Creates a new server instance.
@@ -55,9 +66,31 @@ public class MailboxServer implements IMailboxServer, Runnable {
         this.component_id = componentId;
         dmap_server_reader = new BufferedReader(new InputStreamReader(in));
         dmap_server_writer = new PrintWriter(out);
+        concurrentHashMap_messages = new ConcurrentHashMap<>();
     }
 
-    public static void saveMessageInHashMap(String[] messageForMailboxServer) {
+    public static synchronized void saveMessageInHashMap(ArrayList<String> users, String sender, String subject, String data) {
+        int key = hashMap_id.get();
+
+        for (String user: users
+             ) {
+            if (!concurrentHashMap_messages.containsKey(user)) {
+                concurrentHashMap_messages.put(user, new ConcurrentHashMap<Integer, String[]>());
+            }
+            concurrentHashMap_messages.get(user).put(key, new String[]{sender, subject, data});
+
+
+            System.out.println("concurrent hashmap of user: " + user);
+            for (String[] message:concurrentHashMap_messages.get(user).values()
+            ) {
+                System.out.println(Arrays.toString(message));
+            }
+        }
+
+        hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
+
+
+
 
     }
 
@@ -74,6 +107,7 @@ public class MailboxServer implements IMailboxServer, Runnable {
         } catch (IOException e){
             e.printStackTrace();
         }
+
             System.out.println("DMAP Server is UP and listening on port: " + dmap_mailboxServer.getLocalPort());
             Thread dmapListener = new DmapListener(dmap_mailboxServer, config);
             dmapListener.start();

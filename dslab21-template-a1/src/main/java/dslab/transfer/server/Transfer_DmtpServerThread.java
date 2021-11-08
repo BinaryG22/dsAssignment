@@ -1,9 +1,7 @@
-package dslab.DMTP;
+package dslab.transfer.server;
 
-import dslab.ComponentFactory;
-import dslab.DMTP.DmtProtocol;
-import dslab.mailbox.MailboxServer;
-import dslab.transfer.TransferServerClient;
+import dslab.protocol.DmtProtocol;
+import dslab.transfer.client.TransferServerClient;
 import dslab.util.Config;
 
 import java.io.*;
@@ -13,14 +11,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-public class DmtpServerThread extends Thread{
+public class Transfer_DmtpServerThread extends Thread{
     private Socket clientSocket;
     private DmtProtocol dmtProtocol;
     private ExecutorService threadPool;
     private Config config;
 
 
-    public DmtpServerThread(Socket clientSocket, Config config){
+    public Transfer_DmtpServerThread(Socket clientSocket, Config config){
         this.config = config;
         this.clientSocket = clientSocket;
         this.dmtProtocol = new DmtProtocol(config);
@@ -64,10 +62,6 @@ public class DmtpServerThread extends Thread{
                         System.out.println(Arrays.toString(messageForMailboxServer));
                         threadPool = Executors.newCachedThreadPool();
                         threadPool.submit(new TransferServerClient(config, messageForMailboxServer));
-                    }
-
-                    if (response.equals("save")){
-                        MailboxServer.saveMessageInHashMap(dmtProtocol.getMessageForMailboxServer());
                     }
 
 

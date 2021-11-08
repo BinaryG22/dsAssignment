@@ -1,6 +1,5 @@
-package dslab.mailbox;
+package dslab.mailbox.dmap;
 
-import dslab.DMAP.DmapServerThread;
 import dslab.util.Config;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class DmapListener extends Thread{
         try {
             client = dmapServerSocket.accept();
             dmap_threadPool = Executors.newCachedThreadPool();
-            dmap_threadPool.submit(new DmapServerThread(client, config));
+            dmap_threadPool.submit(new Mailbox_DmapServerThread(client, config));
         } catch (IOException e) {
             e.printStackTrace();
         }

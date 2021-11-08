@@ -1,11 +1,19 @@
-package dslab.DMAP;
+package dslab.protocol;
 
+import dslab.mailbox.MailboxServer;
 import dslab.util.Config;
 
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DmaProtocol {
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
     private boolean isLoggedIn;
     final static String PROTOCOL_TYPE = "DMAP";
     final static String DEFAULT_RESPONSE = "ok";
@@ -13,6 +21,7 @@ public class DmaProtocol {
     private Config config;
     private boolean connectionIsEstablished;
     private String userName = null;
+    private ArrayList<String[]> allMessages;
 
     //k = message ID; v = user?
     private int messageID;
@@ -22,6 +31,7 @@ public class DmaProtocol {
         isLoggedIn = false;
         connectionIsEstablished = false;
         this.config = config;
+        allMessages = new ArrayList<>();
     }
 
     public String validateRequest(String request) {
@@ -78,8 +88,22 @@ public class DmaProtocol {
     }
 
     private String list() {
-        return null;
-
+        if (isLoggedIn) {
+            if (MailboxServer.getConcurrentHashMap_messages().get(userName) != null) {
+                ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
+                for (Integer k : hashMap.keySet()
+                ) {
+                    String[] message = hashMap.get(k);
+                    allMessages.add(new String[]{k.toString(), message[0], message[1]});
+                }
+                System.out.println(allMessages.size());
+                for (String[] messages : allMessages
+                ) {
+                    System.out.println(Arrays.toString(messages));
+                }
+                return "ok";
+            }else return "currently no entries";
+        }else return "you must be logged in first";
     }
 
     private String login(String[] parts) {
@@ -123,5 +147,13 @@ public class DmaProtocol {
             connectionIsEstablished = true;
             return DEFAULT_RESPONSE + " " + PROTOCOL_TYPE;
         } else return "Error DMAP connection error";
+    }
+
+    public ArrayList<String[]> getAllMessages() {
+        return allMessages;
+    }
+
+    public void clearMessages() {
+        allMessages.clear();
     }
 }
