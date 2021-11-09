@@ -24,12 +24,12 @@ dslab/protocol/DmaProtocol.java
  dslab.protocol.DmaProtocol
 dslab/mailbox/dmap/Mailbox_DmapServerThread.java
  dslab.mailbox.dmap.Mailbox_DmapServerThread
-dslab/ComponentFactory.java
- dslab.ComponentFactory
-dslab/transfer/TransferServer.java
- dslab.transfer.TransferServer
 dslab/transfer/server/Transfer_DmtpServerThread.java
  dslab.transfer.server.Transfer_DmtpServerThread
+dslab/transfer/TransferServer.java
+ dslab.transfer.TransferServer
+dslab/ComponentFactory.java
+ dslab.ComponentFactory
 dslab/monitoring/MonitoringServer.java
  dslab.monitoring.MonitoringServer
 dslab/monitoring/ListenerThread.java

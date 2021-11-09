@@ -2,7 +2,9 @@ package dslab.monitoring;
 
 import java.io.*;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import dslab.ComponentFactory;
 import dslab.util.Config;
@@ -13,6 +15,8 @@ public class MonitoringServer implements IMonitoringServer {
     private DatagramSocket datagramSocket;
     public static ConcurrentHashMap<String, Integer> adresses;
     public static ConcurrentHashMap<String, Integer> servers;
+    private static AtomicInteger count_adressList = new AtomicInteger(0);
+    private static AtomicInteger count_serverList = new AtomicInteger(0);
     /**
      * Creates a new server instance.
      *
@@ -25,6 +29,31 @@ public class MonitoringServer implements IMonitoringServer {
         this.config = config;
         adresses = new ConcurrentHashMap<>();
         servers = new ConcurrentHashMap<>();
+
+    }
+
+    public static synchronized void  addToListOfAddresses(String sender) {
+        if (!adresses.containsKey(sender)){
+            adresses.put(sender, 1);
+        }else {
+
+            int currentCount = adresses.get(sender);
+            int newValue = currentCount + 1;
+            System.out.println("newValue = " + newValue);
+            adresses.replace(sender, newValue);
+        }
+    }
+
+    public static synchronized void addToListOfServices(InetAddress address, int port) {
+        String key = address + ":" + port;
+        if (!servers.containsKey(key)){
+            servers.put(key, 1);
+        }else {
+            int currentCount = servers.get(key);
+            int newValue = currentCount + 1;
+            System.out.println("newValue = " + newValue);
+            servers.replace(key, newValue);
+        }
     }
 
     @Override
@@ -49,11 +78,29 @@ public class MonitoringServer implements IMonitoringServer {
     @Override
     public void addresses() {
         // TODO
+        for (String key: adresses.keySet()){
+            System.out.println(key +" = "+adresses.get(key));
+        }
+    }
+
+    public static void DEBUG_ADRESSES(){
+        // TODO
+        for (String key: adresses.keySet()){
+            System.out.println(key +" = "+adresses.get(key));
+        }
+    }
+
+    public static void DEBUG_SERVERS(){
+        for (String key: servers.keySet()){
+            System.out.println(key +" = "+servers.get(key));
+        }
     }
 
     @Override
     public void servers() {
-        // TODO
+        for (String key: servers.keySet()){
+            System.out.println(key +" = "+servers.get(key));
+        }
     }
 
     @Override

@@ -46,14 +46,19 @@ public class ListenerThread extends Thread {
                 // packet
                 InetAddress address = packet.getAddress();
                 // get the port of the sender from the received packet
-                int port = packet.getPort();
-
-
                 String[] parts = request.split("\\s");
-                System.out.println(parts[1]);
+                String[] parts_1 = parts[0].split(":");
+                int port = Integer.parseInt(parts_1[1]);
+
+
 
                 addToListOfAdresses(parts[1]);
                 addToListOfServers(address, port);
+
+                System.out.println("adresses");
+                MonitoringServer.DEBUG_ADRESSES();
+                System.out.println("servers");
+                MonitoringServer.DEBUG_SERVERS();
             }
 
         } catch (SocketException e) {
@@ -72,11 +77,12 @@ public class ListenerThread extends Thread {
     }
 
     private void addToListOfServers(InetAddress address, int port) {
-        // to sth with the list in the MonitorServer
+        MonitoringServer.addToListOfServices(address, port);
     }
 
     private void addToListOfAdresses(String sender) {
         // to do sth with the list in the monitor server
+        MonitoringServer.addToListOfAddresses(sender);
     }
 
 
