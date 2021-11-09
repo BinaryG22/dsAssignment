@@ -45,8 +45,6 @@ public class Mailbox_DmapServerThread extends Thread{
                  * check if request has the correct format: !ping
                  * <client-name>
                  */
-                response = dmaProtocol.validateRequest(request);
-
                 if (request.equals("list")){
                     System.out.println("log in status: " + dmaProtocol.isLoggedIn());
                     if (dmaProtocol.isLoggedIn()){
@@ -61,6 +59,17 @@ public class Mailbox_DmapServerThread extends Thread{
                         dmaProtocol.clearMessages();
                     }else response = "you must first log in";
                 }
+
+                if (request.startsWith("show")){
+                    if (dmaProtocol.validateRequest(request).equals("ok")){
+                        for (String messagesInDmtp : dmaProtocol.getMessagesById()
+                             ) {
+                            writer.println(messagesInDmtp);
+                            writer.flush();
+                        }
+                    }
+                }
+                response = dmaProtocol.validateRequest(request);
                 writer.println("Server answers: " + response);
                 writer.flush();
             }

@@ -10,6 +10,12 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DmaProtocol {
+    public String[] getMessagesById() {
+        return messagesById;
+    }
+
+    private String[] messagesById;
+
     public boolean isLoggedIn() {
         return isLoggedIn;
     }
@@ -22,6 +28,8 @@ public class DmaProtocol {
     private boolean connectionIsEstablished;
     private String userName = null;
     private ArrayList<String[]> allMessages;
+
+
 
     //k = message ID; v = user?
     private int messageID;
@@ -106,8 +114,29 @@ public class DmaProtocol {
     }
 
     private String show(String[] parts) {
-        return null;
-
+        if (!isLoggedIn){
+            return "you must be logged in first";
+        }
+        if (parts.length != 2){
+            return PROTOCOL_ERROR;
+        }
+        if (!isNumeric(parts[1])){
+            return "id must be a number";
+        }
+        if (MailboxServer.getConcurrentHashMap_messages().get(userName) != null){
+            ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
+            if (!hashMap.containsKey(Integer.parseInt(parts[1]))){
+                return "can not find message with this id " + parts[1];
+            }
+            //sender, subject, data
+            String[] fromHashMap = hashMap.get(Integer.parseInt(parts[1]));
+            String receiver = "to " + userName + "@" + config.getString("domain");
+            String sender = "from " + fromHashMap[0];
+            String subject = "subject " + fromHashMap[1];
+            String data = "data " + fromHashMap[2];
+            messagesById = new String[]{receiver, sender, subject, data};
+        }
+        return DEFAULT_RESPONSE;
     }
 
     private String list() {
