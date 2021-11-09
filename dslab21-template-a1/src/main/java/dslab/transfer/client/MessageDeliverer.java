@@ -50,6 +50,7 @@ public class MessageDeliverer implements Runnable{
             //userInputReader = new BufferedReader(new InputStreamReader(System.in));
             PrintWriter outputWriter = new PrintWriter(System.out);
 
+
             int msg_index = 0;
             System.out.println("message is:" + Arrays.toString(message));
             while (true) {

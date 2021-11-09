@@ -113,12 +113,10 @@ public class DmtProtocol {
         messageToMailboxServer[4] = "data " + data;
         messageToMailboxServer[5] = "save";
 
-        resetAllValues();
-
         return "send";
     }
 
-    private void resetAllValues() {
+    public void resetAllValues() {
         sender = null;
         data = null;
         recipients.clear();

@@ -57,7 +57,7 @@ public class TransferServer implements ITransferServer, Runnable {
 
                 System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
                 Socket newClient = tcp_server.accept();
-                threadPool.submit(new Transfer_DmtpServerThread(newClient, config));
+                threadPool.submit(new Transfer_DmtpServerThread(tcp_server, newClient, config));
 
 
                 // closing or shutdown
