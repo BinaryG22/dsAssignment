@@ -31,7 +31,7 @@ public class Mailbox_DmapServerThread extends Thread{
             // prepare the writer for responding to clients requests
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 
-            writer.println("Server answers: " + dmaProtocol.checkConnection(clientSocket));
+            writer.println(dmaProtocol.checkConnection(clientSocket));
             writer.flush();
 
 
@@ -70,7 +70,7 @@ public class Mailbox_DmapServerThread extends Thread{
                     }
                 }
                 response = dmaProtocol.validateRequest(request);
-                writer.println("Server answers: " + response);
+                writer.println(response);
                 writer.flush();
             }
             clientSocket.close();

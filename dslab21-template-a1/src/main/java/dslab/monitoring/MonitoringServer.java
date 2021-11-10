@@ -6,7 +6,9 @@ import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
+import dslab.shell.IShell;
 import dslab.util.Config;
 
 public class MonitoringServer implements IMonitoringServer {
@@ -17,6 +19,7 @@ public class MonitoringServer implements IMonitoringServer {
     public static ConcurrentHashMap<String, Integer> servers;
     private static AtomicInteger count_adressList = new AtomicInteger(0);
     private static AtomicInteger count_serverList = new AtomicInteger(0);
+    private PrintWriter out ;
     /**
      * Creates a new server instance.
      *
@@ -29,6 +32,7 @@ public class MonitoringServer implements IMonitoringServer {
         this.config = config;
         adresses = new ConcurrentHashMap<>();
         servers = new ConcurrentHashMap<>();
+        this.out = new PrintWriter(out);
 
     }
 
@@ -75,31 +79,44 @@ public class MonitoringServer implements IMonitoringServer {
         //close();
     }
 
+    @Command
     @Override
     public void addresses() {
         // TODO
         for (String key: adresses.keySet()){
-            System.out.println(key +" = "+adresses.get(key));
+            System.out.println(key +" "+adresses.get(key));
+        }
+
+        for (String key: adresses.keySet()){
+            out.println(key + " " + adresses.get(key));
+            out.flush();
         }
     }
 
     public static void DEBUG_ADRESSES(){
         // TODO
         for (String key: adresses.keySet()){
-            System.out.println(key +" = "+adresses.get(key));
+            System.out.println(key +" "+adresses.get(key));
         }
     }
 
     public static void DEBUG_SERVERS(){
         for (String key: servers.keySet()){
-            System.out.println(key +" = "+servers.get(key));
+            System.out.println(key +" "+servers.get(key));
         }
     }
 
+    @Command
     @Override
     public void servers() {
         for (String key: servers.keySet()){
-            System.out.println(key +" = "+servers.get(key));
+            System.out.println(key +" "+servers.get(key));
+        }
+
+
+        for (String key: servers.keySet()){
+            out.println(key + " " + servers.get(key));
+            out.flush();
         }
     }
 
@@ -122,6 +139,9 @@ public class MonitoringServer implements IMonitoringServer {
     public static void main(String[] args) throws Exception {
         IMonitoringServer server = ComponentFactory.createMonitoringServer(args[0], System.in, System.out);
         server.run();
+
+        IShell shell = ComponentFactory.createShellExample(args[0], System.in, System.out);
+        shell.run();
     }
 
 }

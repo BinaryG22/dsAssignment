@@ -39,7 +39,7 @@ public class Transfer_DmtpServerThread extends Thread {
 
             System.out.println(dmtProtocol.checkConnection(clientSocket));
 
-            writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
+            writer.println(dmtProtocol.checkConnection(clientSocket));
             writer.flush();
 
 
@@ -57,9 +57,10 @@ public class Transfer_DmtpServerThread extends Thread {
                  * <client-name>
                  */
 
-                response = dmtProtocol.validateRequest(request);
 
-                if (response.equals("send")) {
+
+                if (request.equals("send")) {
+                    dmtProtocol.validateRequest(request);
                     String[] messageForMailboxServer = dmtProtocol.getMessageForMailboxServer();
                     System.out.println(Arrays.toString(messageForMailboxServer));
                     threadPool = Executors.newCachedThreadPool();
@@ -71,9 +72,9 @@ public class Transfer_DmtpServerThread extends Thread {
                     dmtProtocol.resetAllValues();
                 }
 
-
+                response = dmtProtocol.validateRequest(request);
                 System.out.println("server answers: " + response);
-                writer.println("Server answers: " + response);
+                writer.println(response);
                 writer.flush();
             }
             // construct response here

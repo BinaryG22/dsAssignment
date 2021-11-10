@@ -113,7 +113,7 @@ public class DmtProtocol {
         messageToMailboxServer[4] = "data " + data;
         messageToMailboxServer[5] = "save";
 
-        return "send";
+        return DEFAULT_RESPONSE;
     }
 
     public void resetAllValues() {
@@ -132,7 +132,7 @@ public class DmtProtocol {
     }
 
     private String quit() {
-        return "call quit() in dmtp";
+        return "ok bye";
     }
 
     private String setRecipients(String[] parts) {

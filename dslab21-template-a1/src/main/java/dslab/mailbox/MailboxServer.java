@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import dslab.ComponentFactory;
 import dslab.mailbox.dmap.DmapListener;
 import dslab.mailbox.dmtp.DmtpListener;
+import dslab.shell.IShell;
 import dslab.util.Config;
 
 public class MailboxServer implements IMailboxServer, Runnable {
@@ -127,5 +128,8 @@ public class MailboxServer implements IMailboxServer, Runnable {
     public static void main(String[] args) throws Exception {
         IMailboxServer server = ComponentFactory.createMailboxServer(args[0], System.in, System.out);
         server.run();
+
+        IShell shell = ComponentFactory.createShellExample(args[0], System.in, System.out);
+        shell.run();
     }
 }
