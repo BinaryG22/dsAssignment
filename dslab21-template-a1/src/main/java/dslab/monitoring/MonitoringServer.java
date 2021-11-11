@@ -4,22 +4,21 @@ import java.io.*;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
 import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
-import dslab.shell.IShell;
+
 import dslab.util.Config;
 
 public class MonitoringServer implements IMonitoringServer {
 
     private Config config;
     private DatagramSocket datagramSocket;
-    public static ConcurrentHashMap<String, Integer> adresses;
-    public static ConcurrentHashMap<String, Integer> servers;
-    private static AtomicInteger count_adressList = new AtomicInteger(0);
-    private static AtomicInteger count_serverList = new AtomicInteger(0);
-    private PrintWriter out ;
+    public  ConcurrentHashMap<String, Integer> adresses = new ConcurrentHashMap<>();
+    public  ConcurrentHashMap<String, Integer> servers = new ConcurrentHashMap<>();
+    private Shell shell;
     /**
      * Creates a new server instance.
      *
@@ -30,35 +29,10 @@ public class MonitoringServer implements IMonitoringServer {
      */
     public MonitoringServer(String componentId, Config config, InputStream in, PrintStream out) {
         this.config = config;
-        adresses = new ConcurrentHashMap<>();
-        servers = new ConcurrentHashMap<>();
-        this.out = new PrintWriter(out);
-
+        this.shell = new Shell(in, out);
+        this.shell.register(this);
     }
 
-    public static synchronized void  addToListOfAddresses(String sender) {
-        if (!adresses.containsKey(sender)){
-            adresses.put(sender, 1);
-        }else {
-
-            int currentCount = adresses.get(sender);
-            int newValue = currentCount + 1;
-            System.out.println("newValue = " + newValue);
-            adresses.replace(sender, newValue);
-        }
-    }
-
-    public static synchronized void addToListOfServices(InetAddress address, int port) {
-        String key = address + ":" + port;
-        if (!servers.containsKey(key)){
-            servers.put(key, 1);
-        }else {
-            int currentCount = servers.get(key);
-            int newValue = currentCount + 1;
-            System.out.println("newValue = " + newValue);
-            servers.replace(key, newValue);
-        }
-    }
 
     @Override
     public void run() {
@@ -70,10 +44,13 @@ public class MonitoringServer implements IMonitoringServer {
 
 
             // create a new thread to listen for incoming packets
-            new ListenerThread(datagramSocket).start();
+            new ListenerThread(datagramSocket, servers, adresses).start();
         } catch (IOException e) {
             throw new RuntimeException("Cannot listen on UDP port.", e);
         }
+
+        //run shell
+        shell.run();
 
         // close socket and listening thread
         //close();
@@ -82,51 +59,33 @@ public class MonitoringServer implements IMonitoringServer {
     @Command
     @Override
     public void addresses() {
-        // TODO
         for (String key: adresses.keySet()){
-            System.out.println(key +" "+adresses.get(key));
-        }
-
-        for (String key: adresses.keySet()){
-            out.println(key + " " + adresses.get(key));
-            out.flush();
+            System.out.println(key + " " + adresses.get(key));
+            shell.out().println(key + " " + adresses.get(key));
         }
     }
 
-    public static void DEBUG_ADRESSES(){
-        // TODO
-        for (String key: adresses.keySet()){
-            System.out.println(key +" "+adresses.get(key));
-        }
-    }
 
-    public static void DEBUG_SERVERS(){
-        for (String key: servers.keySet()){
-            System.out.println(key +" "+servers.get(key));
+
+
+        @Command
+        @Override
+        public void servers(){
+            for (String key: servers.keySet()){
+                System.out.println(key + " " + servers.get(key));
+                shell.out().println(key + " " + servers.get(key));
+            }
         }
-    }
 
     @Command
     @Override
-    public void servers() {
-        for (String key: servers.keySet()){
-            System.out.println(key +" "+servers.get(key));
-        }
-
-
-        for (String key: servers.keySet()){
-            out.println(key + " " + servers.get(key));
-            out.flush();
-        }
-    }
-
-    @Override
     public void shutdown() {
-        // TODO
+        close();
+        throw new StopShellException();
     }
 
 
-    public void close() {
+    private void close() {
         /*
          * Note that closing the socket also triggers an exception in the
          * listening thread
@@ -139,9 +98,6 @@ public class MonitoringServer implements IMonitoringServer {
     public static void main(String[] args) throws Exception {
         IMonitoringServer server = ComponentFactory.createMonitoringServer(args[0], System.in, System.out);
         server.run();
-
-        IShell shell = ComponentFactory.createShellExample(args[0], System.in, System.out);
-        shell.run();
     }
 
 }

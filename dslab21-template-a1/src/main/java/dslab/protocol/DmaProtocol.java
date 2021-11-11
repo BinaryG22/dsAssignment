@@ -82,7 +82,7 @@ public class DmaProtocol {
     }
 
     private String quit() {
-        return null;
+        return "ok bye";
     }
 
     private String delete(String[] parts) {
@@ -167,9 +167,9 @@ public class DmaProtocol {
             if (checkUser(parts[1], parts[2])) {
                 userName = parts[1];
                 isLoggedIn = true;
-                return "Successfully logged in!";
+                return DEFAULT_RESPONSE;
                 //Todo: why if checkuser return false im not landing in the return statement below
-            } return "Wrong username/password combination!";
+            } return "error wrong username/password combination!";
         }else return PROTOCOL_ERROR;
     }
 

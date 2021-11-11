@@ -6,16 +6,17 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
+import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
-import dslab.shell.IShell;
-import dslab.transfer.server.Transfer_DmtpServerThread;
 import dslab.util.Config;
 
 public class TransferServer implements ITransferServer, Runnable {
     private String component_id;
     private Config config;
     private ServerSocket tcp_server = null;
-
+private Shell shell;
 
 
     /**
@@ -29,6 +30,8 @@ public class TransferServer implements ITransferServer, Runnable {
     public TransferServer(String componentId, Config config, InputStream in, PrintStream out) {
         this.component_id = componentId;
         this.config = config;
+        this.shell = new Shell(in, out);
+        this.shell.register(this);
     }
 
     @Override
@@ -43,20 +46,35 @@ public class TransferServer implements ITransferServer, Runnable {
         System.out.println("Transfer Server is UP and listening on port: " + tcp_server.getLocalPort());
 
         new ListenerThread(tcp_server, config).start();
+
+        shell.run();
     }
 
+    @Command
     @Override
     public void shutdown() {
+        close();
+        throw new StopShellException();
+    }
 
+    private void close() {
+        /*
+         * Note that closing the socket also triggers an exception in the
+         * listening thread
+         */
+        if (tcp_server != null) {
+            try {
+                tcp_server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
         ITransferServer server = ComponentFactory.createTransferServer(args[0], System.in, System.out);
         server.run();
 
-        System.out.println("config id/name: " + args[0]);
-        IShell shell = ComponentFactory.createShellExample(args[0], System.in, System.out);
-        shell.run();
 
     }
 

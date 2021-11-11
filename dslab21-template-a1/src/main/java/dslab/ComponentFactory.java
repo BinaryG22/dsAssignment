@@ -7,8 +7,7 @@ import dslab.mailbox.IMailboxServer;
 import dslab.mailbox.MailboxServer;
 import dslab.monitoring.IMonitoringServer;
 import dslab.monitoring.MonitoringServer;
-import dslab.shell.IShell;
-import dslab.shell.Shell;
+
 import dslab.transfer.ITransferServer;
 import dslab.transfer.TransferServer;
 import dslab.util.Config;
@@ -79,16 +78,5 @@ public final class ComponentFactory {
         return new TransferServer(componentId, config, in, out);
     }
 
-    public static IShell createShellExample(String componentName, InputStream in, PrintStream out)
-            throws Exception {
-        // Define the config object to be used by the shell-example
-
-        // is a config necessary?
-        Config config = new Config(componentName);
-
-        // Instantiate a new ShellExample with the given credentials and return
-        // it
-        return new Shell(componentName,config, in, out);
-    }
 
 }

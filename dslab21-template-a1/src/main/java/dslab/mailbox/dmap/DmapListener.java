@@ -21,12 +21,15 @@ public class DmapListener extends Thread{
 
     @Override
     public void run() {
-        try {
-            client = dmapServerSocket.accept();
-            dmap_threadPool = Executors.newCachedThreadPool();
-            dmap_threadPool.submit(new Mailbox_DmapServerThread(client, config));
-        } catch (IOException e) {
-            e.printStackTrace();
+        while (true) {
+            try {
+                dmap_threadPool = Executors.newCachedThreadPool();
+                client = dmapServerSocket.accept();
+                dmap_threadPool.submit(new Mailbox_DmapServerThread(client, config));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
