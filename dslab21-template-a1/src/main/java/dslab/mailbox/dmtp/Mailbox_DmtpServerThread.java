@@ -40,7 +40,7 @@ public class Mailbox_DmtpServerThread extends Thread{
 
             System.out.println(dmtProtocol.checkConnection(clientSocket));
 
-            writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
+            writer.println(dmtProtocol.checkConnection(clientSocket));
             writer.flush();
 
 
@@ -65,15 +65,15 @@ public class Mailbox_DmtpServerThread extends Thread{
                     ) {
                         String[] parseAdress = adress.split("@");
                         if (!userConfig.listKeys().contains(parseAdress[0])){
-                            response = "unknown user " + parseAdress[0];
+                            response = "error unknown user " + parseAdress[0];
                             System.out.println("server answers: " +response);
-                            writer.println("Server answers: " + response);
+                            writer.println(response);
                             writer.flush();
                         }else {
                             users_messageBeingSentTo.add(parseAdress[0]);
                             response = "ok " + users_messageBeingSentTo.size();
                             System.out.println("server answers: " +response);
-                            writer.println("Server answers: " + response);
+                            writer.println(response);
                             writer.flush();
                         }
                     }
@@ -89,7 +89,7 @@ public class Mailbox_DmtpServerThread extends Thread{
 
                     response = dmtProtocol.validateRequest(request);
                     System.out.println("server answers: " +response);
-                    writer.println("Server answers: " + response);
+                    writer.println(response);
                     writer.flush();
                 }
 

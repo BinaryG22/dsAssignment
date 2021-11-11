@@ -55,7 +55,7 @@ public class MailboxServerProtocolTest extends TestBase {
     }
 
     @Test(timeout = 15000)
-    public void login_withInvalidLogin_returnsError() throws Exception {
+    public void login_withInvaluidLogin_returnsError() throws Exception {
         try (JunitSocketClient client = new JunitSocketClient(dmapServerPort, err)) {
             client.verify("ok DMAP");
             client.sendAndVerify("login trillian WRONGPW", "error");

@@ -6,6 +6,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Thread to listen for incoming data packets on the given socket.
@@ -13,9 +16,14 @@ import java.net.SocketException;
 public class ListenerThread extends Thread {
 
     private DatagramSocket datagramSocket;
+    private ConcurrentHashMap<String, Integer> servers;
+    private  ConcurrentHashMap<String, Integer> addresses;
 
-    public ListenerThread(DatagramSocket datagramSocket) {
+    public ListenerThread(DatagramSocket datagramSocket, ConcurrentHashMap servers, ConcurrentHashMap addresses) {
         this.datagramSocket = datagramSocket;
+        this.servers = servers;
+        this.addresses = addresses;
+
     }
 
     public void run() {
@@ -27,7 +35,7 @@ public class ListenerThread extends Thread {
         DatagramPacket packet;
         try {
             while (true) {
-                buffer = new byte[512];
+                buffer = new byte[128];
                 // create a datagram packet of specified length (buffer.length)
                 /*
                  * Keep in mind that, in UDP, packet delivery is not guaranteed,
@@ -38,8 +46,7 @@ public class ListenerThread extends Thread {
                 // wait for incoming packets from client
                 datagramSocket.receive(packet);
                 // get the data from the packet
-                String request = new String(packet.getData());
-
+                String request = new String(packet.getData(), 0, packet.getLength());
                 System.out.println("Received request-packet from client: " + request);
 
                 // get the address of the sender (client) from the received
@@ -50,21 +57,16 @@ public class ListenerThread extends Thread {
                 String[] parts_1 = parts[0].split(":");
                 int port = Integer.parseInt(parts_1[1]);
 
+                System.out.println(Arrays.toString(parts));
 
-
-                addToListOfAdresses(parts[1]);
+                addToListOfAddresses(parts[1]);
                 addToListOfServers(address, port);
-
-                System.out.println("adresses");
-                MonitoringServer.DEBUG_ADRESSES();
-                System.out.println("servers");
-                MonitoringServer.DEBUG_SERVERS();
             }
 
         } catch (SocketException e) {
             // when the socket is closed, the send or receive methods of the DatagramSocket will throw a SocketException
             System.out.println("SocketException while waiting for/handling packets: " + e.getMessage());
-            return;
+
         } catch (IOException e) {
             // other exceptions should be handled correctly in your implementation
             throw new UncheckedIOException(e);
@@ -76,13 +78,28 @@ public class ListenerThread extends Thread {
 
     }
 
-    private void addToListOfServers(InetAddress address, int port) {
-        MonitoringServer.addToListOfServices(address, port);
+    public  synchronized void  addToListOfAddresses(String sender) {
+        if (!addresses.containsKey(sender)){
+            addresses.put(sender, 1);
+        }else {
+
+            int currentCount = addresses.get(sender);
+            int newValue = currentCount + 1;
+            System.out.println("newValue = " + newValue);
+            addresses.replace(sender, newValue);
+        }
     }
 
-    private void addToListOfAdresses(String sender) {
-        // to do sth with the list in the monitor server
-        MonitoringServer.addToListOfAddresses(sender);
+    public  synchronized void addToListOfServers(InetAddress address, int port) {
+        String key = address + ":" + port;
+        if (!servers.containsKey(key)){
+            servers.put(key, 1);
+        }else {
+            int currentCount = servers.get(key);
+            int newValue = currentCount + 1;
+            System.out.println("newValue = " + newValue);
+            servers.replace(key, newValue);
+        }
     }
 
 

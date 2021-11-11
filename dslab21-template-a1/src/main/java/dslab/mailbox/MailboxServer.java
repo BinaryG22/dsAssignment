@@ -10,6 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
+import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
 import dslab.mailbox.dmap.DmapListener;
 import dslab.mailbox.dmtp.DmtpListener;
@@ -20,10 +23,6 @@ public class MailboxServer implements IMailboxServer, Runnable {
     DMAP
      */
     private ServerSocket dmap_mailboxServer = null;
-    private Socket dmap_clientSocket = null;
-    private BufferedReader dmap_server_reader;
-    private PrintWriter dmap_server_writer;
-    private ExecutorService dmap_threadPool;
     /*
     DMAP
      */
@@ -32,16 +31,12 @@ public class MailboxServer implements IMailboxServer, Runnable {
     DMTP
      */
     private ServerSocket dmtp_mailboxServer = null;
-    private Socket dmtp_clientSocket = null;
-    private BufferedReader dmtp_server_reader;
-    private PrintWriter dmtp_server_writer;
-    private ExecutorService dmtp_threadPool;
-    private String component_id;
     /*
     DMTP
      */
 
     private Config config;
+    private Shell shell;
 
     public static ConcurrentHashMap<String, ConcurrentHashMap<Integer, String[]>> getConcurrentHashMap_messages() {
         return concurrentHashMap_messages;
@@ -63,10 +58,9 @@ public class MailboxServer implements IMailboxServer, Runnable {
      */
     public MailboxServer(String componentId, Config config, InputStream in, PrintStream out) {
         this.config = config;
-        this.component_id = componentId;
-        dmap_server_reader = new BufferedReader(new InputStreamReader(in));
-        dmap_server_writer = new PrintWriter(out);
         concurrentHashMap_messages = new ConcurrentHashMap<>();
+        this.shell = new Shell(in, out);
+        this.shell.register(this);
     }
 
     public static synchronized void saveMessageInHashMap(ArrayList<String> users, String sender, String subject, String data) {
@@ -88,8 +82,6 @@ public class MailboxServer implements IMailboxServer, Runnable {
         }
 
         hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
-
-
 
 
     }
@@ -117,15 +109,44 @@ public class MailboxServer implements IMailboxServer, Runnable {
             Thread dmtpListener = new DmtpListener(dmtp_mailboxServer, config);
             dmtpListener.start();
 
+            shell.run();
+
     }
 
+    @Command
     @Override
     public void shutdown() {
-        // TODO
+        close();
+        throw new StopShellException();
+    }
+
+    private void close() {
+
+
+        /*
+         * Note that closing the socket also triggers an exception in the
+         * listening thread
+         */
+        if (dmtp_mailboxServer != null) {
+            try {
+                dmtp_mailboxServer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (dmap_mailboxServer != null){
+            try {
+                dmap_mailboxServer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void main(String[] args) throws Exception {
         IMailboxServer server = ComponentFactory.createMailboxServer(args[0], System.in, System.out);
         server.run();
+
+
     }
 }

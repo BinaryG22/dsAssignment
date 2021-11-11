@@ -31,7 +31,7 @@ public class Mailbox_DmapServerThread extends Thread{
             // prepare the writer for responding to clients requests
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
 
-            writer.println("Server answers: " + dmaProtocol.checkConnection(clientSocket));
+            writer.println(dmaProtocol.checkConnection(clientSocket));
             writer.flush();
 
 
@@ -48,8 +48,6 @@ public class Mailbox_DmapServerThread extends Thread{
                 if (request.equals("list")){
                     System.out.println("log in status: " + dmaProtocol.isLoggedIn());
                     if (dmaProtocol.isLoggedIn()){
-                        writer.println("[ID, sender, subject]");
-                        writer.flush();
                         for (String[] message: dmaProtocol.getAllMessages()
                         ) {
                             System.out.println(Arrays.toString(message));
@@ -70,7 +68,7 @@ public class Mailbox_DmapServerThread extends Thread{
                     }
                 }
                 response = dmaProtocol.validateRequest(request);
-                writer.println("Server answers: " + response);
+                writer.println(response);
                 writer.flush();
             }
             clientSocket.close();

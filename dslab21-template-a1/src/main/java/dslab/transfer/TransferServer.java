@@ -6,26 +6,17 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import at.ac.tuwien.dsg.orvell.Shell;
+import at.ac.tuwien.dsg.orvell.StopShellException;
+import at.ac.tuwien.dsg.orvell.annotation.Command;
 import dslab.ComponentFactory;
-import dslab.transfer.server.Transfer_DmtpServerThread;
 import dslab.util.Config;
 
 public class TransferServer implements ITransferServer, Runnable {
     private String component_id;
-    /*
-    TCP
-     */
-    private ServerSocket tcp_server = null;
-    private Socket tcp_clientSocket = null;
-    private BufferedReader server_reader;
-    private PrintWriter server_writer;
-    private ExecutorService threadPool;
-
-    //save a Buffer for handling saving (or better preparing or creating) messages and forwarding messages
-    /*
-    TCP
-     */
     private Config config;
+    private ServerSocket tcp_server = null;
+private Shell shell;
 
 
     /**
@@ -39,49 +30,52 @@ public class TransferServer implements ITransferServer, Runnable {
     public TransferServer(String componentId, Config config, InputStream in, PrintStream out) {
         this.component_id = componentId;
         this.config = config;
-        server_reader = new BufferedReader(new InputStreamReader(in));
-        server_writer = new PrintWriter(out);
+        this.shell = new Shell(in, out);
+        this.shell.register(this);
     }
 
     @Override
     public void run() {
         try {
             tcp_server = new ServerSocket(config.getInt("tcp.port"));
-            threadPool = Executors.newCachedThreadPool();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        while (true) {
-            try {
 
-                System.out.println("Server is UP and listening on port: " + tcp_server.getLocalPort());
-                Socket newClient = tcp_server.accept();
-                threadPool.submit(new Transfer_DmtpServerThread(tcp_server, newClient, config));
+        System.out.println("Transfer Server is UP and listening on port: " + tcp_server.getLocalPort());
 
+        new ListenerThread(tcp_server, config).start();
 
-                // closing or shutdown
-            } catch (IOException e) {
-                e.printStackTrace();
-                shutdown();
-            }
-
-        }
+        shell.run();
     }
 
+    @Command
     @Override
     public void shutdown() {
-        threadPool.shutdownNow();
-        try {
-            tcp_server.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        close();
+        throw new StopShellException();
+    }
+
+    private void close() {
+        /*
+         * Note that closing the socket also triggers an exception in the
+         * listening thread
+         */
+        if (tcp_server != null) {
+            try {
+                tcp_server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public static void main(String[] args) throws Exception {
         ITransferServer server = ComponentFactory.createTransferServer(args[0], System.in, System.out);
         server.run();
+
+
     }
 
 }

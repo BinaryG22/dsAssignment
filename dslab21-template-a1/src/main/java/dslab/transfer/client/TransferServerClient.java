@@ -34,13 +34,13 @@ public class TransferServerClient implements Runnable{
              * client1.properties and client2.properties)
              */
 
-            if (message[2].contains("earth.planet")) {
-                new Thread(new MessageDeliverer(domain_config, "earth.planet", message)).start();
-            }
+        if (message[2].contains("earth.planet")) {
+            new Thread(new MessageDeliverer(domain_config, "earth.planet", message)).start();
+        }
 
-            if (message[2].contains("univer.ze")){
-                new Thread(new MessageDeliverer(domain_config, "univer.ze", message)).start();
-            }
+        if (message[2].contains("univer.ze")) {
+            new Thread(new MessageDeliverer(domain_config, "univer.ze", message)).start();
+        }
 
     }
 }

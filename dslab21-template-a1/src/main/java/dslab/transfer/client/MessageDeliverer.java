@@ -3,6 +3,7 @@ package dslab.transfer.client;
 import dslab.util.Config;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -25,7 +26,8 @@ public class MessageDeliverer implements Runnable{
             try {
                 socket = new Socket(parts[0], Integer.parseInt(parts[1]));
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("SocketException while handling socket at host: "
+                        + parts[0] + " and port: " + Integer.parseInt(parts[1]));
             }
         }else if (domainName.equals(UNIVER_ZE_DOMAIN)){
             String[] parts = config.getString("univer.ze").split(":");
@@ -33,7 +35,8 @@ public class MessageDeliverer implements Runnable{
             try {
                 socket = new Socket(parts[0], Integer.parseInt(parts[1]));
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("SocketException while handling socket at host: "
+                        + parts[0] + " and port: " + Integer.parseInt(parts[1]));
             }
         }
     }
@@ -41,31 +44,30 @@ public class MessageDeliverer implements Runnable{
     @Override
     public void run() {
         try {
-            assert socket != null;
             // create a reader to retrieve messages send by the server
-            BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // create a writer to send messages to the server
-            PrintWriter serverWriter = new PrintWriter(socket.getOutputStream());
-            // create the client input reader from command line
-            //userInputReader = new BufferedReader(new InputStreamReader(System.in));
-            PrintWriter outputWriter = new PrintWriter(System.out);
+            if (socket != null) {
+                BufferedReader serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                // create a writer to send messages to the server
+                PrintWriter serverWriter = new PrintWriter(socket.getOutputStream());
+                // create the client input reader from command line
+                //userInputReader = new BufferedReader(new InputStreamReader(System.in));
+                PrintWriter outputWriter = new PrintWriter(System.out);
 
 
-            int msg_index = 0;
-            System.out.println("message is:" + Arrays.toString(message));
-            while (true) {
+                int msg_index = 0;
+                System.out.println("message is:" + Arrays.toString(message));
+                while (true) {
 
-                String answerFromServer = serverReader.readLine();
-                System.out.println("answer from mailbox server:" + answerFromServer);
+                    String answerFromServer = serverReader.readLine();
+                    System.out.println("answer from mailbox server:" + answerFromServer);
 
-                if (msg_index < message.length) {
-                    serverWriter.println(message[msg_index]);
-                    serverWriter.flush();
-                    msg_index++;
-                } else break;
+                    if (msg_index < message.length) {
+                        serverWriter.println(message[msg_index]);
+                        serverWriter.flush();
+                        msg_index++;
+                    } else break;
+                }
             }
-            //close socket?;
-            socket = null;
         }
 
 

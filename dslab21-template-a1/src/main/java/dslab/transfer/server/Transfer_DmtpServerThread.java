@@ -39,7 +39,7 @@ public class Transfer_DmtpServerThread extends Thread {
 
             System.out.println(dmtProtocol.checkConnection(clientSocket));
 
-            writer.println("Server answers: " + dmtProtocol.checkConnection(clientSocket));
+            writer.println(dmtProtocol.checkConnection(clientSocket));
             writer.flush();
 
 
@@ -59,21 +59,20 @@ public class Transfer_DmtpServerThread extends Thread {
 
                 response = dmtProtocol.validateRequest(request);
 
-                if (response.equals("send")) {
+
+                if (request.equals("send") && response.equals("ok")) {
                     String[] messageForMailboxServer = dmtProtocol.getMessageForMailboxServer();
                     System.out.println(Arrays.toString(messageForMailboxServer));
                     threadPool = Executors.newCachedThreadPool();
                     threadPool.submit(new TransferServerClient(config, messageForMailboxServer));
 
-                    //todo: right format for sending messages to monitor
                     sendToMonitorServer(dmtProtocol.getSender());
 
                     dmtProtocol.resetAllValues();
                 }
 
-
                 System.out.println("server answers: " + response);
-                writer.println("Server answers: " + response);
+                writer.println(response);
                 writer.flush();
             }
             // construct response here
@@ -104,6 +103,7 @@ public class Transfer_DmtpServerThread extends Thread {
 
                 // convert the input String to a byte[]
                 buffer = toSend.getBytes();
+
                 // create the datagram packet with all the necessary information
                 // for sending the packet to the server
                 packet = new DatagramPacket(buffer, buffer.length,
