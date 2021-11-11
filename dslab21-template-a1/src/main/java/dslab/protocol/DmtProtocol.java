@@ -100,10 +100,13 @@ public class DmtProtocol {
 
 
     private String sendMessage() {
+        System.out.println("recipients set?: " + recipientIsSet);
+
         messageToMailboxServer = new String[6];
         if (!senderIsSet) return "error no Sender";
         if (!recipientIsSet) return "error no recipients";
         if (!subjectIsSet) return "error no subject";
+        if (!dataIsSet) return "error no data";
 
         isSend = true;
         messageToMailboxServer[0] = "begin";
@@ -111,6 +114,7 @@ public class DmtProtocol {
         messageToMailboxServer[2] = "to " + recipients_asString;
         messageToMailboxServer[3] = "subject " + subject;
         messageToMailboxServer[4] = "data " + data;
+        //remove save?
         messageToMailboxServer[5] = "save";
 
         return DEFAULT_RESPONSE;
@@ -150,12 +154,15 @@ public class DmtProtocol {
                 ) {
                     if (adress.contains("@")){
                         String[] parseAdress = adress.split("@");
-                        if (parseAdress[1].equals("earth.planet") || parseAdress[1].equals("univer.ze")){
-                            recipients.addAll(List.of(adress));
-                        }else return adress + " contains an unknown domain";
+                        recipients.addAll(List.of(adress));
+                        /*if (parseAdress[1].equals("earth.planet") || parseAdress[1].equals("univer.ze")){
+
+                        }else return adress + " contains an unknown domain";*/
                     }else return "missing '@'";
                 }
-                return DEFAULT_RESPONSE + " " + recipients.size();
+
+
+            return DEFAULT_RESPONSE + " " + recipients.size();
         }
     }
 

@@ -22,15 +22,14 @@ public class DmtpListener extends Thread{
     @Override
     public void run() {
         dmtp_threadPool = Executors.newCachedThreadPool();
-        while (true)
+        while (true) {
             try {
                 client = dmtpServerSocket.accept();
                 dmtp_threadPool.submit(new Mailbox_DmtpServerThread(client, config));
             } catch (IOException e) {
-                shutdown();
-                e.printStackTrace();
             }
         }
+    }
 
     private void shutdown() {
         try {

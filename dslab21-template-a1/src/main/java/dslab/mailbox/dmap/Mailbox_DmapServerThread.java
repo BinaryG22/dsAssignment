@@ -71,10 +71,14 @@ public class Mailbox_DmapServerThread extends Thread{
                 writer.println(response);
                 writer.flush();
             }
-            clientSocket.close();
             // construct response here
-        } catch (IOException e) {
-            e.printStackTrace();
+        }  catch (IOException e) {
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            System.out.println(e.getMessage());
         }
 
 

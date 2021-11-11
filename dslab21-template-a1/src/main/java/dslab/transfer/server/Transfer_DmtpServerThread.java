@@ -64,7 +64,7 @@ public class Transfer_DmtpServerThread extends Thread {
                     String[] messageForMailboxServer = dmtProtocol.getMessageForMailboxServer();
                     System.out.println(Arrays.toString(messageForMailboxServer));
                     threadPool = Executors.newCachedThreadPool();
-                    threadPool.submit(new TransferServerClient(config, messageForMailboxServer));
+                    threadPool.submit(new TransferServerClient(config, messageForMailboxServer, writer));
 
                     sendToMonitorServer(dmtProtocol.getSender());
 

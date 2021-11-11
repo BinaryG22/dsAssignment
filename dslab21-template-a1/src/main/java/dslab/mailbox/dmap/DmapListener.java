@@ -28,7 +28,6 @@ public class DmapListener extends Thread{
                 dmap_threadPool.submit(new Mailbox_DmapServerThread(client, config));
 
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }

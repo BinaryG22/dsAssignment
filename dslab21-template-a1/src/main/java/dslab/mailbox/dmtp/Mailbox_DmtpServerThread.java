@@ -93,19 +93,15 @@ public class Mailbox_DmtpServerThread extends Thread{
                     writer.flush();
                 }
 
-
-
-
             }
-            clientSocket.close();
-            // construct response here
+
         } catch (IOException e) {
             try {
                 clientSocket.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
 
