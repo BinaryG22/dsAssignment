@@ -46,20 +46,23 @@ public class Mailbox_DmapServerThread extends Thread{
                  * <client-name>
                  */
                 if (request.equals("list")){
+                    response = dmaProtocol.validateRequest(request);
                     if (dmaProtocol.isLoggedIn()){
-                        response = dmaProtocol.validateRequest(request);
                         for (String[] message: dmaProtocol.getAllMessages()
                         ) {
                             writer.println(message[0] + " " + message[1] + " " + message[2]);
                             writer.flush();
                         }
                         dmaProtocol.clearMessages();
+                        writer.println(response);
+                        writer.flush();
                     }else {
                         response = "error you must first log in";
                         writer.println(response);
                         writer.flush();
                     }
                 }else if (request.startsWith("show")){
+                    response = dmaProtocol.validateRequest(request);
                     if (dmaProtocol.isLoggedIn()) {
                         if (dmaProtocol.validateRequest(request).equals("ok")) {
                             for (String messagesInDmtp : dmaProtocol.getMessagesById()
@@ -68,6 +71,8 @@ public class Mailbox_DmapServerThread extends Thread{
                                 writer.flush();
                             }
                         }
+                        writer.println(response);
+                        writer.flush();
                     }else{
                         response = "error you must first log in";
                         writer.println(response);

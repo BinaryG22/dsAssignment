@@ -85,7 +85,6 @@ public class ListenerThread extends Thread {
 
             int currentCount = addresses.get(sender);
             int newValue = currentCount + 1;
-            System.out.println("newValue = " + newValue);
             addresses.replace(sender, newValue);
         }
     }
@@ -97,7 +96,6 @@ public class ListenerThread extends Thread {
         }else {
             int currentCount = servers.get(key);
             int newValue = currentCount + 1;
-            System.out.println("newValue = " + newValue);
             servers.replace(key, newValue);
         }
     }

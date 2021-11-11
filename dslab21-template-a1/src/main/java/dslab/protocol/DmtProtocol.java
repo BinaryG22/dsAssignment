@@ -143,7 +143,7 @@ public class DmtProtocol {
         String[] addresses = null;
         recipients.clear();
         if (parts.length == 1){
-            return "recipients not set";
+            return "error recipients not set";
         }else{
             recipientIsSet = true;
             recipients_asString = parts[1];
@@ -152,12 +152,10 @@ public class DmtProtocol {
             }else addresses = new String[] {parts[1]};
                 for (String adress:addresses
                 ) {
-                    if (adress.contains("@")){
+                    if (adress.contains("@") && adress.contains(".")){
                         recipients.addAll(List.of(adress));
-                    }else return "missing '@'";
+                    }else return "error not a valid mail address";
                 }
-
-            System.out.println("iohdidn "+ recipientIsSet);
             return DEFAULT_RESPONSE + " " + recipients.size();
         }
     }
@@ -177,7 +175,7 @@ public class DmtProtocol {
             data = sb.toString();
             return DEFAULT_RESPONSE;
         }
-        return "message not set";
+        return "error message not set";
     }
 
     private String setSubject(String[] parts) {
@@ -195,16 +193,18 @@ public class DmtProtocol {
             subject = sb.toString();
             return DEFAULT_RESPONSE;
         }
-        return "subject not set";
+        return "error subject not set";
     }
 
     private String setSender(String[] parts) {
         if (parts.length != 2){
-            return "use exactly one sender";
+            return "error use exactly one sender";
         }else {
             senderIsSet = true;
             sender = parts[1];
-            return DEFAULT_RESPONSE;
+                if (!(sender.contains("@") && sender.contains("."))){
+                    return "error not a valid mail address";
+                }else return DEFAULT_RESPONSE;
         }
     }
 
@@ -213,8 +213,8 @@ public class DmtProtocol {
             if (parts.length == 1) {
                 messageIsStarted = true;
                 return DEFAULT_RESPONSE;
-            } else return "'begin <?>' command too long, try only 'begin'";
-        } else return "message already started";
+            } else return "error 'begin <?>' command too long, try only 'begin'";
+        } else return "error message already started";
     }
 
     public String checkConnection(Socket client){

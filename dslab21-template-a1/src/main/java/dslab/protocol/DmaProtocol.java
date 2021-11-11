@@ -52,7 +52,7 @@ public class DmaProtocol {
                 response = login(parts);
                 break;
             case "list":
-                response = list();
+                response = list(parts);
                 break;
             case "show":
                 response = show(parts);
@@ -116,18 +116,18 @@ public class DmaProtocol {
 
     private String show(String[] parts) {
         if (!isLoggedIn){
-            return "you must be logged in first";
+            return "error you must be logged in first";
         }
         if (parts.length != 2){
             return PROTOCOL_ERROR;
         }
         if (!isNumeric(parts[1])){
-            return "id must be a number";
+            return "error id must be a number";
         }
         if (MailboxServer.getConcurrentHashMap_messages().get(userName) != null){
             ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
             if (!hashMap.containsKey(Integer.parseInt(parts[1]))){
-                return "can not find message with this id " + parts[1];
+                return "error can not find message with this id " + parts[1];
             }
             //sender, subject, data
             String[] fromHashMap = hashMap.get(Integer.parseInt(parts[1]));
@@ -136,11 +136,15 @@ public class DmaProtocol {
             String subject = "subject " + fromHashMap[1];
             String data = "data " + fromHashMap[2];
             messagesById = new String[]{receiver, sender, subject, data};
+            return DEFAULT_RESPONSE;
         }
-        return DEFAULT_RESPONSE;
+        return "error can not find message with this id " + parts[1];
     }
 
-    private String list() {
+    private String list(String[] parts) {
+        if (parts.length != 1){
+            return PROTOCOL_ERROR;
+        }
         if (isLoggedIn) {
             if (MailboxServer.getConcurrentHashMap_messages().get(userName) != null) {
                 ConcurrentHashMap<Integer, String[]> hashMap = MailboxServer.getConcurrentHashMap_messages().get(userName);
@@ -148,11 +152,6 @@ public class DmaProtocol {
                 ) {
                     String[] message = hashMap.get(k);
                     allMessages.add(new String[]{k.toString(), message[0], message[1]});
-                }
-                System.out.println(allMessages.size());
-                for (String[] messages : allMessages
-                ) {
-                    System.out.println(Arrays.toString(messages));
                 }
                 return "ok";
             }else return "currently no entries";

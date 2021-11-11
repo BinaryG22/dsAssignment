@@ -72,13 +72,6 @@ public class MailboxServer implements IMailboxServer, Runnable {
                 concurrentHashMap_messages.put(user, new ConcurrentHashMap<Integer, String[]>());
             }
             concurrentHashMap_messages.get(user).put(key, new String[]{sender, subject, data});
-
-
-            System.out.println("concurrent hashmap of user: " + user);
-            for (String[] message:concurrentHashMap_messages.get(user).values()
-            ) {
-                System.out.println(Arrays.toString(message));
-            }
         }
 
         hashMap_id = new AtomicInteger(hashMap_id.incrementAndGet());
