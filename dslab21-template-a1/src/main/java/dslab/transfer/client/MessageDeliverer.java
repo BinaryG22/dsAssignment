@@ -55,7 +55,6 @@ public class MessageDeliverer implements Runnable{
 
 
                 int msg_index = 0;
-                System.out.println("message is:" + Arrays.toString(message));
                 while (true) {
 
                     String answerFromServer = serverReader.readLine();

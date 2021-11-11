@@ -60,7 +60,6 @@ public class MonitoringServer implements IMonitoringServer {
     @Override
     public void addresses() {
         for (String key: adresses.keySet()){
-            System.out.println(key + " " + adresses.get(key));
             shell.out().println(key + " " + adresses.get(key));
         }
     }
@@ -72,7 +71,6 @@ public class MonitoringServer implements IMonitoringServer {
         @Override
         public void servers(){
             for (String key: servers.keySet()){
-                System.out.println(key + " " + servers.get(key));
                 shell.out().println(key + " " + servers.get(key));
             }
         }
