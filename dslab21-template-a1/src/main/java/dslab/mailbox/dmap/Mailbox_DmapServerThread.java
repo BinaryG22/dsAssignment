@@ -56,9 +56,7 @@ public class Mailbox_DmapServerThread extends Thread{
                         }
                         dmaProtocol.clearMessages();
                     }else response = "you must first log in";
-                }
-
-                if (request.startsWith("show")){
+                }else if (request.startsWith("show")){
                     if (dmaProtocol.validateRequest(request).equals("ok")){
                         for (String messagesInDmtp : dmaProtocol.getMessagesById()
                              ) {
@@ -66,22 +64,22 @@ public class Mailbox_DmapServerThread extends Thread{
                             writer.flush();
                         }
                     }
+                }else {
+                    response = dmaProtocol.validateRequest(request);
+                    writer.println(response);
+                    writer.flush();
+
+                    if (response.equals("ok bye")){
+                        writer.println(response);
+                        writer.flush();
+                        writer.close();
+                    }
                 }
-                response = dmaProtocol.validateRequest(request);
-                writer.println(response);
-                writer.flush();
             }
             // construct response here
         }  catch (IOException e) {
-            try {
-                clientSocket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            System.out.println(e.getMessage());
+
         }
-
-
 
     }
 }

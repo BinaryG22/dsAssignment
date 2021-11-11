@@ -15,6 +15,7 @@ public class DmaProtocol {
     }
 
     private String[] messagesById;
+    private String loginAttempt_errorMessage;
 
     public boolean isLoggedIn() {
         return isLoggedIn;
@@ -168,30 +169,28 @@ public class DmaProtocol {
                 userName = parts[1];
                 isLoggedIn = true;
                 return DEFAULT_RESPONSE;
-                //Todo: why if checkuser return false im not landing in the return statement below
-            } return "error wrong username/password combination!";
+            } return loginAttempt_errorMessage;
         }else return PROTOCOL_ERROR;
     }
 
     private boolean checkUser(String username, String pw) {
-        System.out.println("username[1]: " + username);
-        System.out.println("password[2]: " + pw);
-
         String user_config_location = config.getString("users.config");
-        System.out.println(user_config_location);
         Config users_config = new Config(user_config_location);
-        System.out.println(users_config.listKeys());
 
         if (users_config.containsKey(username)) {
             String password = users_config.getString(username);
-            System.out.println("received password: " + password);
             if (password == null) {
                 return false;
             }
 
-            System.out.println(password.equals(pw));
+            if (!password.equals(pw)){
+                loginAttempt_errorMessage = "error wrong password";
+            }
             return password.equals(pw);
-        }else  return false;
+        }else  {
+            loginAttempt_errorMessage = "error unknown user";
+            return false;
+        }
     }
 
     public String checkConnection(Socket client) {

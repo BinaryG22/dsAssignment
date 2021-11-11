@@ -74,15 +74,14 @@ public class Transfer_DmtpServerThread extends Thread {
                 System.out.println("server answers: " + response);
                 writer.println(response);
                 writer.flush();
+
+
+                if (response.equals("ok bye")){
+                    clientSocket.close();
+                }
             }
             // construct response here
         } catch (IOException e) {
-            try {
-                clientSocket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            e.printStackTrace();
         }
 
 

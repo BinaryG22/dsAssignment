@@ -52,6 +52,7 @@ public class Mailbox_DmtpServerThread extends Thread{
             while ((request = reader.readLine()) != null) {
                 System.out.println("Client sent the following request: " + request);
 
+
                 if (request.startsWith("to")){
                     String user_config_location = config.getString("users.config");
                     Config userConfig = new Config(user_config_location);
@@ -65,7 +66,7 @@ public class Mailbox_DmtpServerThread extends Thread{
                     ) {
                         String[] parseAdress = adress.split("@");
                         if (!userConfig.listKeys().contains(parseAdress[0])){
-                            response = "error unknown user " + parseAdress[0];
+                            response = "error unknown recipient " + parseAdress[0];
                             System.out.println("server answers: " +response);
                             writer.println(response);
                             writer.flush();
@@ -85,23 +86,18 @@ public class Mailbox_DmtpServerThread extends Thread{
 
                         MailboxServer.saveMessageInHashMap(users_messageBeingSentTo, sender, subject, data);
                         break;
+                    }else {
+                        response = dmtProtocol.validateRequest(request);
+                        System.out.println("server answers: " + response);
+                        writer.println(response);
+                        writer.flush();
                     }
-
-                    response = dmtProtocol.validateRequest(request);
-                    System.out.println("server answers: " +response);
-                    writer.println(response);
-                    writer.flush();
                 }
 
             }
 
         } catch (IOException e) {
-            try {
-                clientSocket.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            System.out.println(e.getMessage());
+
         }
 
 

@@ -34,7 +34,6 @@ public class ListenerThread extends Thread {
                 threadPool.submit(new Transfer_DmtpServerThread(tcp_server, newClient, config));
 
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
