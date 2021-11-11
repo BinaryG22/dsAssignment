@@ -21,9 +21,9 @@ public class DmapListener extends Thread{
 
     @Override
     public void run() {
+        dmap_threadPool = Executors.newCachedThreadPool();
         while (true) {
             try {
-                dmap_threadPool = Executors.newCachedThreadPool();
                 client = dmapServerSocket.accept();
                 dmap_threadPool.submit(new Mailbox_DmapServerThread(client, config));
 

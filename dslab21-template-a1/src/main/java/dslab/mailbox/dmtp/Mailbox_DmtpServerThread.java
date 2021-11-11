@@ -72,29 +72,36 @@ public class Mailbox_DmtpServerThread extends Thread{
                             writer.flush();
                         }else {
                             users_messageBeingSentTo.add(parseAdress[0]);
+                            dmtProtocol.setIsRecipientsSet(true);
                             response = "ok " + users_messageBeingSentTo.size();
                             System.out.println("server answers: " +response);
                             writer.println(response);
                             writer.flush();
                         }
                     }
-                }else{
-                    if (request.equals("save")){
+                }else if (request.equals("send")) {
                         String sender = dmtProtocol.getSender();
                         String subject = dmtProtocol.getSubject();
                         String data = dmtProtocol.getData();
 
                         MailboxServer.saveMessageInHashMap(users_messageBeingSentTo, sender, subject, data);
-                        break;
-                    }else {
+
                         response = dmtProtocol.validateRequest(request);
-                        System.out.println("server answers: " + response);
                         writer.println(response);
                         writer.flush();
-                    }
-                }
+                    }else{
+                        response = dmtProtocol.validateRequest(request);
+                        writer.println(response);
+                        writer.flush();
 
+
+                        System.out.println(response);
+                        if (response.equals("ok bye")) {
+                            break;
+                        }
+                    }
             }
+            writer.close();
 
         } catch (IOException e) {
 

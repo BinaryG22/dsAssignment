@@ -77,9 +77,10 @@ public class Transfer_DmtpServerThread extends Thread {
 
 
                 if (response.equals("ok bye")){
-                    clientSocket.close();
+                    break;
                 }
             }
+            writer.close();
             // construct response here
         } catch (IOException e) {
         }

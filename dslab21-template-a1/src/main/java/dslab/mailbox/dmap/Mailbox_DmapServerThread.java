@@ -46,36 +46,46 @@ public class Mailbox_DmapServerThread extends Thread{
                  * <client-name>
                  */
                 if (request.equals("list")){
-                    System.out.println("log in status: " + dmaProtocol.isLoggedIn());
                     if (dmaProtocol.isLoggedIn()){
+                        response = dmaProtocol.validateRequest(request);
                         for (String[] message: dmaProtocol.getAllMessages()
                         ) {
-                            System.out.println(Arrays.toString(message));
-                            writer.println(Arrays.toString(message));
+                            writer.println(message[0] + " " + message[1] + " " + message[2]);
                             writer.flush();
                         }
                         dmaProtocol.clearMessages();
-                    }else response = "you must first log in";
+                    }else {
+                        response = "error you must first log in";
+                        writer.println(response);
+                        writer.flush();
+                    }
                 }else if (request.startsWith("show")){
-                    if (dmaProtocol.validateRequest(request).equals("ok")){
-                        for (String messagesInDmtp : dmaProtocol.getMessagesById()
-                             ) {
-                            writer.println(messagesInDmtp);
-                            writer.flush();
+                    if (dmaProtocol.isLoggedIn()) {
+                        if (dmaProtocol.validateRequest(request).equals("ok")) {
+                            for (String messagesInDmtp : dmaProtocol.getMessagesById()
+                            ) {
+                                writer.println(messagesInDmtp);
+                                writer.flush();
+                            }
                         }
+                    }else{
+                        response = "error you must first log in";
+                        writer.println(response);
+                        writer.flush();
                     }
                 }else {
                     response = dmaProtocol.validateRequest(request);
                     writer.println(response);
                     writer.flush();
 
+
+                    System.out.println(response);
                     if (response.equals("ok bye")){
-                        writer.println(response);
-                        writer.flush();
-                        writer.close();
+                        break;
                     }
                 }
             }
+            writer.close();
             // construct response here
         }  catch (IOException e) {
 
